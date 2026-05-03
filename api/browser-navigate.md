@@ -86,7 +86,12 @@ async function search(keyword, page) {
         name: el.querySelector('.title')?.textContent?.trim() || '',
         author: el.querySelector('.author')?.textContent?.trim() || '',
         bookUrl: el.querySelector('a')?.href || '',
-        coverUrl: el.querySelector('img')?.src || ''
+        coverUrl: el.querySelector('img')?.src || '',
+        latestChapter: el.querySelector('.latest a')?.textContent?.trim() || '',
+        latestChapterUrl: el.querySelector('.latest a')?.href || '',
+        wordCount: el.querySelector('.words')?.textContent?.trim() || '',
+        updateTime: el.querySelector('.updated')?.textContent?.trim() || '',
+        status: el.querySelector('.status')?.textContent?.trim() || ''
       };
     });
   `, { visible: false, waitUntil: 'load', timeoutSecs: 30 });

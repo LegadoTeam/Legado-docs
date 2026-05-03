@@ -112,6 +112,10 @@ export default defineConfig({
           items: [{ text: 'legado.image.*', link: '/api/image' }],
         },
         {
+          text: '设备标识',
+          items: [{ text: 'getMachineUid / getMachineUUID', link: '/api/device-id' }],
+        },
+        {
           text: '其他',
           items: [
             { text: 'legado.log / toast', link: '/api/log' },
@@ -149,6 +153,7 @@ export default defineConfig({
           text: 'AI 提示词',
           items: [
             { text: '总览', link: '/prompt/' },
+            { text: '如何使用 AI 编程工具', link: '/prompt/ai-workflow' },
             { text: '书源制作提示词', link: '/prompt/booksource' },
           ],
         },

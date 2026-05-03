@@ -11,12 +11,26 @@ async function TEST() {
   assert(results.length > 0, '搜索应返回结果');
   assert(results[0].name, '结果应有 name 字段');
   assert(results[0].bookUrl, '结果应有 bookUrl 字段');
+  if (results[0].latestChapter || results[0].lastChapter) {
+    legado.log('[TEST] 搜索最新章节: ' + (results[0].latestChapter || results[0].lastChapter));
+  }
+  if (results[0].wordCount || results[0].chapterCount || results[0].updateTime || results[0].status) {
+    legado.log('[TEST] 搜索元数据: ' + JSON.stringify({
+      wordCount: results[0].wordCount,
+      chapterCount: results[0].chapterCount,
+      updateTime: results[0].updateTime,
+      status: results[0].status
+    }));
+  }
   legado.log('[TEST] 搜索通过，返回 ' + results.length + ' 条');
 
   // 测试书籍信息
   var info = await bookInfo(results[0].bookUrl);
   assert(info.name, 'bookInfo 应返回 name');
   assert(info.tocUrl, 'bookInfo 应返回 tocUrl');
+  if (info.latestChapter || info.lastChapter) {
+    legado.log('[TEST] 详情最新章节: ' + (info.latestChapter || info.lastChapter));
+  }
   legado.log('[TEST] 书籍信息通过');
 
   // 测试章节列表

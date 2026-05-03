@@ -32,7 +32,12 @@ async function search(keyword, page) {
       name: legado.dom.selectText(items[i], '.title'),
       author: legado.dom.selectText(items[i], '.author'),
       bookUrl: absUrl(legado.dom.selectAttr(items[i], 'a', 'href')),
-      coverUrl: legado.dom.selectAttr(items[i], 'img', 'src')
+      coverUrl: legado.dom.selectAttr(items[i], 'img', 'src'),
+      latestChapter: legado.dom.selectText(items[i], '.latest a'),
+      latestChapterUrl: legado.dom.selectAttr(items[i], '.latest a', 'href'),
+      wordCount: legado.dom.selectText(items[i], '.words'),
+      updateTime: legado.dom.selectText(items[i], '.updated'),
+      status: legado.dom.selectText(items[i], '.status')
     });
   }
   legado.dom.free(doc);
@@ -48,7 +53,13 @@ async function bookInfo(bookUrl) {
     bookUrl: bookUrl,
     tocUrl: bookUrl,
     coverUrl: legado.dom.selectAttr(doc, '.cover img', 'src'),
-    intro: legado.dom.selectText(doc, '.intro')
+    intro: legado.dom.selectText(doc, '.intro'),
+    latestChapter: legado.dom.selectText(doc, '.latest a'),
+    latestChapterUrl: legado.dom.selectAttr(doc, '.latest a', 'href'),
+    wordCount: legado.dom.selectText(doc, '.words'),
+    chapterCount: Number(legado.dom.selectText(doc, '.chapter-count').replace(/\D/g, '')) || 0,
+    updateTime: legado.dom.selectText(doc, '.updated'),
+    status: legado.dom.selectText(doc, '.status')
   };
   legado.dom.free(doc);
   return info;

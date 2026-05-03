@@ -56,6 +56,12 @@ async function search(keyword, page) {
 | `legado.hmacSha256(data, key)` | 已异步 | 同上 |
 | `legado.aesEncrypt(data, key, iv?, mode?)` | 已异步 | 通过 `asyncAes` |
 | `legado.aesDecrypt(data, key, iv?, mode?)` | 已异步 | 通过 `asyncAes` |
+| `legado.aesDecryptB64Iv(cipher, key, ivB64, mode?)` | 已异步 | 通过 `asyncAesB64Iv` |
+| `legado.desEncrypt(data, key, iv?)` | 已异步 | 通过 `asyncDes` |
+| `legado.desDecrypt(data, key, iv?)` | 已异步 | 通过 `asyncDes` |
+| `legado.htmlEncode(str)` | 已异步 | 返回 `Promise.resolve()`，可 `await` |
+| `legado.htmlDecode(str)` | 已异步 | 返回 `Promise.resolve()`，可 `await` |
+| `legado.urlEncodeCharset(str, charset)` | 已异步 | 返回 `Promise.resolve()`，可 `await` |
 
 ## 仍然保持同步语义的本地能力
 
@@ -65,8 +71,8 @@ async function search(keyword, page) {
 | --- | --- |
 | `legado.dom.*` | 同步 |
 | `legado.base64Encode / base64Decode` | 同步 |
-| `legado.urlEncode / urlDecode / urlEncodeCharset` | 同步 |
-| `legado.htmlEncode / htmlDecode` | 同步 |
+| `legado.urlEncode / urlDecode` | 同步 |
+| `legado.base64ByteSlice` | 同步 |
 | `legado.config.read / write / readBytes / writeBytes` | 同步 |
 | `legado.log / toast / ui.emit` | 同步 |
 
@@ -79,8 +85,6 @@ async function search(keyword, page) {
 | `legado.http.postBinary` | 未实现 |
 | `legado.http.batchGet` | 未实现 |
 | `legado.http.cookies / setCookie` | 未实现 |
-| `legado.aesDecryptB64Iv` | 未实现 |
-| `legado.desEncrypt / desDecrypt` | 未实现 |
 | `legado.image.*` | 未实现 |
 
 如果你的书源依赖以上能力，当前不能认为鸿蒙端已经兼容。
@@ -140,9 +144,10 @@ legado.http.request(url, opt)
 为了同时兼容 Tauri 与鸿蒙，当前建议遵守以下约束：
 
 - 所有网络请求都写成 `await legado.http.get/post(...)`
-- 所有哈希和 AES 调用都写成 `await legado.md5(...)`、`await legado.aesDecrypt(...)`
+- 所有哈希和对称加密调用都写成 `await legado.md5(...)`、`await legado.aesDecrypt(...)`、`await legado.desDecrypt(...)`
+- HTML 实体处理和字符集 URL 编码统一写成 `await legado.htmlDecode(...)`、`await legado.urlEncodeCharset(...)`
 - 不要在新书源里继续使用同步网络请求风格
-- 非必要先不要依赖 `postBinary`、`batchGet`、`des`、`image`、`http.cookies`
+- 非必要先不要依赖 `postBinary`、`batchGet`、`image`、`http.cookies`
 - 依赖真实浏览器探测的网站，暂时不要把鸿蒙端当成完全兼容平台
 
 ## 建议模板
@@ -162,6 +167,10 @@ async function search(keyword, page) {
       name: legado.dom.selectText(items[i], '.title'),
       author: legado.dom.selectText(items[i], '.author'),
       bookUrl: legado.dom.selectAttr(items[i], 'a', 'href'),
+      latestChapter: legado.dom.selectText(items[i], '.latest a'),
+      wordCount: legado.dom.selectText(items[i], '.words'),
+      updateTime: legado.dom.selectText(items[i], '.updated'),
+      status: legado.dom.selectText(items[i], '.status'),
     });
   }
 

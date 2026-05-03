@@ -22,8 +22,16 @@ async function search(keyword, page) → Promise<BookItem[]>
 | `author` | `string` | 推荐 | 作者 |
 | `coverUrl` | `string` | 推荐 | 封面图片 URL |
 | `intro` | `string` | 否 | 简介 |
+| `lastChapter` | `string` | 否 | 旧版最新章节字段 |
 | `latestChapter` | `string` | 否 | 最新章节名 |
+| `latestChapterUrl` | `string` | 否 | 最新章节 URL |
+| `wordCount` | `string` | 否 | 字数 |
+| `chapterCount` | `number` | 否 | 章节总数量 |
+| `updateTime` | `string` | 否 | 更新时间 |
+| `status` | `string` | 否 | 连载状态 |
 | `kind` | `string` | 否 | 分类标签 |
+
+完整字段规则见 [BookItem](/api/types-book-item)。新增元数据均为可选字段，旧书源可以继续只返回 `name`、`bookUrl`、`author` 等基础字段。
 
 ## HTML 站点示例
 
@@ -42,7 +50,13 @@ async function search(keyword, page) {
       name: legado.dom.selectText(el, 'h4 a'),
       author: legado.dom.selectText(el, '.author'),
       bookUrl: legado.dom.selectAttr(el, 'h4 a', 'href'),
-      coverUrl: legado.dom.selectAttr(el, 'img', 'src')
+      coverUrl: legado.dom.selectAttr(el, 'img', 'src'),
+      kind: legado.dom.selectText(el, '.category'),
+      latestChapter: legado.dom.selectText(el, '.latest a'),
+      latestChapterUrl: legado.dom.selectAttr(el, '.latest a', 'href'),
+      wordCount: legado.dom.selectText(el, '.words'),
+      updateTime: legado.dom.selectText(el, '.updated'),
+      status: legado.dom.selectText(el, '.status')
     });
   }
 
@@ -69,11 +83,18 @@ async function search(keyword, page) {
       bookUrl: BASE + '/book/' + book.id,
       author: book.author,
       coverUrl: book.cover,
-      intro: book.summary
+      intro: book.summary,
+      latestChapter: book.lastChapter,
+      wordCount: book.wordCountText,
+      chapterCount: book.chapterCount,
+      updateTime: book.updateTime,
+      status: book.status
     };
   });
 }
 ```
+
+搜索结果只返回当前搜索接口或列表页已经提供的元数据；不要为了补齐这些字段在 `search()` 中逐本请求详情页。
 
 ## POST 搜索
 

@@ -22,8 +22,16 @@ async function bookInfo(bookUrl) → Promise<BookItem>
 | `tocUrl` | `string` | ✅ | 目录页 URL（可与 bookUrl 相同） |
 | `coverUrl` | `string` | 推荐 | 封面图片 URL |
 | `intro` | `string` | 推荐 | 书籍简介 |
+| `lastChapter` | `string` | 否 | 旧版最新章节字段 |
 | `latestChapter` | `string` | 否 | 最新章节名 |
+| `latestChapterUrl` | `string` | 否 | 最新章节 URL |
+| `wordCount` | `string` | 否 | 字数 |
+| `chapterCount` | `number` | 否 | 章节总数量 |
+| `updateTime` | `string` | 否 | 更新时间 |
+| `status` | `string` | 否 | 连载状态 |
 | `kind` | `string` | 否 | 分类标签 |
+
+完整字段规则见 [BookItem](/api/types-book-item)。`bookInfo()` 可以比搜索/发现返回更完整的元数据。
 
 ## 基本示例
 
@@ -42,6 +50,11 @@ async function bookInfo(bookUrl) {
     coverUrl: legado.dom.selectAttr(doc, '.book-cover img', 'src'),
     intro: legado.dom.selectText(doc, '.book-intro'),
     latestChapter: legado.dom.selectText(doc, '.latest-chapter a'),
+    latestChapterUrl: legado.dom.selectAttr(doc, '.latest-chapter a', 'href'),
+    wordCount: legado.dom.selectText(doc, '.book-words'),
+    chapterCount: Number(legado.dom.selectText(doc, '.chapter-count').replace(/\D/g, '')) || 0,
+    updateTime: legado.dom.selectText(doc, '.update-time'),
+    status: legado.dom.selectText(doc, '.book-status'),
     kind: legado.dom.selectText(doc, '.book-category')
   };
 
@@ -71,7 +84,9 @@ async function bookInfo(bookUrl) {
     tocUrl: bookUrl,
     coverUrl: legado.dom.selectAttr(doc, '[property="og:image"]', 'content'),
     intro: legado.dom.selectAttr(doc, '[property="og:description"]', 'content'),
-    latestChapter: legado.dom.selectAttr(doc, '[property="og:novel:latest_chapter_name"]', 'content')
+    latestChapter: legado.dom.selectAttr(doc, '[property="og:novel:latest_chapter_name"]', 'content'),
+    updateTime: legado.dom.selectAttr(doc, '[property="og:novel:update_time"]', 'content'),
+    status: legado.dom.selectAttr(doc, '[property="og:novel:status"]', 'content')
   };
 
   legado.dom.free(doc);

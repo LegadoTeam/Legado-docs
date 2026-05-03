@@ -97,7 +97,10 @@ async function search(keyword, page) {
       bookUrl: API + '?ac=detail&ids=' + v.vod_id,
       author: v.vod_director || v.vod_actor,
       coverUrl: v.vod_pic,
-      kind: v.type_name
+      kind: v.type_name,
+      latestChapter: v.vod_remarks,
+      updateTime: v.vod_time,
+      status: v.vod_remarks
     };
   });
 }
@@ -114,6 +117,8 @@ async function bookInfo(bookUrl) {
     coverUrl: v.vod_pic,
     intro: v.vod_blurb || v.vod_content,
     latestChapter: v.vod_remarks,
+    updateTime: v.vod_time,
+    status: v.vod_remarks,
     kind: v.type_name
   };
 }

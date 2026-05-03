@@ -69,6 +69,16 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 | [`legado.image.paste(dest, src, x, y)`](/api/image) | 粘贴 |
 | [`legado.image.encode(handle, format?)`](/api/image) | 编码为 base64 |
 
+### 设备标识 {#device-id}
+
+| API | 说明 |
+|-----|------|
+| [`legado.runtime.getMachineUid()`](/api/device-id) | **返回 `Promise<string>`**：优先获取系统硬件 UID（重装软件不变），不可用时自动回落到软 UUID |
+| [`legado.runtime.getMachineUUID()`](/api/device-id) | **返回 `Promise<string>`**：始终返回应用本地软 UUID（卸载/清数据后重置） |
+
+> **硬件 UID**：与操作系统/硬件绑定，重装软件后不变。
+> **软 UUID**：存于应用数据目录（`app_state.redb`），卸载清除数据后重置。
+
 ### 其他 {#misc}
 
 | API | 说明 |

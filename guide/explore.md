@@ -21,6 +21,8 @@ async function explore(page, category) → Promise<string[] | BookItem[] | { typ
 | 指定分类名 | `BookItem[]` | 该分类下的书籍列表 |
 | 特殊分类（如"设置"） | `{ type: 'html', html: '...' }` | HTML 交互页面 |
 
+`BookItem` 的完整字段规则见 [BookItem](/api/types-book-item)。发现页元数据字段与搜索页一致。
+
 ## 基本示例
 
 ```js
@@ -43,7 +45,12 @@ async function explore(page, category) {
       author: legado.dom.selectText(items[i], '.author'),
       bookUrl: legado.dom.selectAttr(items[i], 'a', 'href'),
       coverUrl: legado.dom.selectAttr(items[i], 'img', 'src'),
-      kind: category
+      kind: category,
+      latestChapter: legado.dom.selectText(items[i], '.latest a'),
+      latestChapterUrl: legado.dom.selectAttr(items[i], '.latest a', 'href'),
+      wordCount: legado.dom.selectText(items[i], '.words'),
+      updateTime: legado.dom.selectText(items[i], '.updated'),
+      status: legado.dom.selectText(items[i], '.status')
     });
   }
 
@@ -51,6 +58,8 @@ async function explore(page, category) {
   return books;
 }
 ```
+
+发现页只返回当前分类页已经提供的元数据；不要为了补齐字数、章节数、状态或更新时间在 `explore()` 中逐本请求详情页。
 
 ## JSON API 发现页
 
@@ -74,7 +83,12 @@ async function explore(page, category) {
       bookUrl: BASE + '/book/' + book.id,
       author: book.author,
       coverUrl: book.cover,
-      kind: category
+      kind: category,
+      latestChapter: book.lastChapter,
+      wordCount: book.wordCountText,
+      chapterCount: book.chapterCount,
+      updateTime: book.updateTime,
+      status: book.status
     };
   });
 }

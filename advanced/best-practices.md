@@ -93,7 +93,12 @@ async function search(keyword, page) {
       name: legado.dom.text(el, '.title'),
       author: legado.dom.text(el, '.author'),
       bookUrl: fullUrl(legado.dom.attr(el, 'a', 'href')),
-      coverUrl: fixCover(legado.dom.attr(el, 'img', 'src'))
+      coverUrl: fixCover(legado.dom.attr(el, 'img', 'src')),
+      latestChapter: legado.dom.text(el, '.latest a'),
+      latestChapterUrl: fullUrl(legado.dom.attr(el, '.latest a', 'href')),
+      wordCount: legado.dom.text(el, '.words'),
+      updateTime: legado.dom.text(el, '.updated'),
+      status: legado.dom.text(el, '.status')
     };
   });
 }
@@ -159,6 +164,14 @@ async function bookInfo(bookUrl) {
       legado.dom.attr(doc, '.cover img', 'src') ||
       legado.dom.attr(doc, 'meta[property="og:image"]', 'content')
     ),
+    latestChapter: legado.dom.text(doc, '.latest a') ||
+      legado.dom.attr(doc, 'meta[property="og:novel:latest_chapter_name"]', 'content'),
+    latestChapterUrl: fullUrl(legado.dom.attr(doc, '.latest a', 'href')),
+    wordCount: legado.dom.text(doc, '.words'),
+    updateTime: legado.dom.text(doc, '.updated') ||
+      legado.dom.attr(doc, 'meta[property="og:novel:update_time"]', 'content'),
+    status: legado.dom.text(doc, '.status') ||
+      legado.dom.attr(doc, 'meta[property="og:novel:status"]', 'content'),
     tocUrl: bookUrl
   };
 }

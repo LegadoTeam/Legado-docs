@@ -79,10 +79,24 @@ async function explore(page, category) {
   var resp = await legado.http.get(BASE + '/api/books?cat=' + encodeURIComponent(category) + '&page=' + page);
   var data = JSON.parse(resp);
   return data.books.map(function(b) {
-    return { name: b.title, author: b.author, bookUrl: b.url, coverUrl: b.cover, kind: category };
+    return {
+      name: b.title,
+      author: b.author,
+      bookUrl: b.url,
+      coverUrl: b.cover,
+      kind: category,
+      latestChapter: b.lastChapter,
+      latestChapterUrl: b.lastChapterUrl,
+      wordCount: b.wordCountText,
+      chapterCount: b.chapterCount,
+      updateTime: b.updateTime,
+      status: b.status
+    };
   });
 }
 ```
+
+标准分类返回的仍是普通 `BookItem[]`，可选元数据字段与 `search()` 一致；HTML 交互页本身不需要返回这些字段。
 
 ## 安全约束
 

@@ -42,12 +42,12 @@ var original = decodeURIComponent('%E6%96%97%E7%A0%B4%E8%8B%8D%E7%A9%B9');
 部分老旧网站搜索参数需要 GBK 编码，标准 JS 不支持，使用专用 API：
 
 ```js
-legado.urlEncodeCharset(str, charset) → string  // 指定字符集编码
+legado.urlEncodeCharset(str, charset) → Promise<string>  // 指定字符集编码
 ```
 
 ```js
 // GBK 编码（老旧站点）
-var q = legado.urlEncodeCharset('斗破苍穹', 'gbk');
+var q = await legado.urlEncodeCharset('斗破苍穹', 'gbk');
 var url = BASE + '/search.php?keyword=' + q;
 ```
 
@@ -56,15 +56,15 @@ var url = BASE + '/search.php?keyword=' + q;
 ## HTML 实体
 
 ```js
-legado.htmlEncode(str) → string    // 字符 → HTML 实体
-legado.htmlDecode(str) → string    // HTML 实体 → 字符
+legado.htmlEncode(str) → Promise<string>    // 字符 → HTML 实体
+legado.htmlDecode(str) → Promise<string>    // HTML 实体 → 字符
 ```
 
 ```js
-legado.htmlEncode('<script>alert(1)</script>');
+await legado.htmlEncode('<script>alert(1)</script>');
 // "&lt;script&gt;alert(1)&lt;/script&gt;"
 
-legado.htmlDecode('&lt;p&gt;Hello&lt;/p&gt;');
+await legado.htmlDecode('&lt;p&gt;Hello&lt;/p&gt;');
 // "<p>Hello</p>"
 ```
 
