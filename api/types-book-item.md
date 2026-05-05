@@ -9,7 +9,7 @@
 | `name` | `string` | ✅ | 书名 |
 | `bookUrl` | `string` | ✅ | 书籍详情页 URL |
 | `author` | `string` | 推荐 | 作者（视频源可填导演/主演） |
-| `coverUrl` | `string` | 推荐 | 封面图片 URL |
+| `coverUrl` | `string \| CoverImageRef` | 推荐 | 封面图片；对象格式可指定来源与请求头 |
 | `tocUrl` | `string` | `bookInfo` 中必填 | 目录页 URL |
 | `intro` | `string` | 否 | 简介 |
 | `lastChapter` | `string` | 否 | 旧版最新章节字段，继续兼容 |
@@ -26,6 +26,21 @@
 - `latestChapter` 是推荐字段；旧书源的 `lastChapter` 仍然兼容。两者同时存在时，界面优先显示 `latestChapter`。
 - `latestChapterUrl` 只在当前页面已经能拿到最新章节链接时填写，不要求额外请求。
 - `wordCount` 使用字符串，保留站点原始格式，例如 `346.16万字`、`约 80 万字`。
+
+## 封面来源
+
+`coverUrl` 兼容旧版字符串，也支持对象：
+
+```js
+{
+  url: 'https://img.example.com/cover.jpg',
+  referer: 'https://www.example.com',
+  sourceUrl: 'https://www.example.com/book/1',
+  headers: { Cookie: '...' }
+}
+```
+
+未指定 `referer` 时，运行时默认使用书源头部的第一个 `@url`。前端会等待 Rust 后端完成封面缓存后再显示本地缓存图片。
 - `chapterCount` 使用数字，只在站点直接提供总章节/总话数/总集数时填写。
 - `updateTime` 使用字符串，保留站点原始日期精度，例如 `2026-04-30`、`昨天`。
 - `status` 使用字符串，保留站点原文，例如 `连载中`、`完本`、`更新至第12集`。

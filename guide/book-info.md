@@ -20,7 +20,7 @@ async function bookInfo(bookUrl) → Promise<BookItem>
 | `author` | `string` | ✅ | 作者 |
 | `bookUrl` | `string` | ✅ | 书籍 URL |
 | `tocUrl` | `string` | ✅ | 目录页 URL（可与 bookUrl 相同） |
-| `coverUrl` | `string` | 推荐 | 封面图片 URL |
+| `coverUrl` | `string \| CoverImageRef` | 推荐 | 封面图片；对象格式可指定来源与请求头 |
 | `intro` | `string` | 推荐 | 书籍简介 |
 | `lastChapter` | `string` | 否 | 旧版最新章节字段 |
 | `latestChapter` | `string` | 否 | 最新章节名 |

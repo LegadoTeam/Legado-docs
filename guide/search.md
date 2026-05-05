@@ -135,6 +135,22 @@ function getCover(el) {
 }
 ```
 
+如果封面站点需要防盗链来源，可以返回对象格式：
+
+```js
+return {
+  name: '示例书',
+  bookUrl: bookUrl,
+  coverUrl: {
+    url: coverUrl,
+    referer: BASE,
+    sourceUrl: bookUrl,
+  },
+};
+```
+
+未指定 `referer` 时，运行时默认使用书源头部第一个 `@url`。
+
 ::: tip 日志规范
 每个函数入口都应打印关键参数日志，方便调试：
 ```js

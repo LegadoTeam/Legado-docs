@@ -155,6 +155,7 @@ export default defineConfig({
             { text: '总览', link: '/prompt/' },
             { text: '如何使用 AI 编程工具', link: '/prompt/ai-workflow' },
             { text: '书源制作提示词', link: '/prompt/booksource' },
+            { text: '书源交付智能体提示词', link: '/prompt/booksource-delivery-agent' },
           ],
         },
       ],
