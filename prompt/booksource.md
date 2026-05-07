@@ -47,7 +47,7 @@ src-tauri\target\x86_64-pc-windows-msvc\release\legado_tauri.exe
 // @version     1.0.0
 // @author      作者
 // @url         https://主站域名
-// @type        novel              // novel | comic | video
+// @type        novel              // novel | comic | video | music
 // @enabled     true
 // @tags        标签1,标签2
 // @description 简短描述
