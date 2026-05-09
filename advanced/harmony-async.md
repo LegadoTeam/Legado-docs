@@ -17,6 +17,8 @@
 目前可以确认：
 
 - `legado.http.get / post / request` 走原生桥接，返回 `Promise`
+- `legado.http.cookies / setCookie` 已接入 ArkWeb CookieManager
+- `legado.browser.*` 已接入 ArkWeb WebView 池，浏览器 Cookie 支持 API 23 全量枚举
 - `legado.md5 / sha1 / sha256 / hmacSha256` 已改为异步 `Promise`
 - `legado.aesEncrypt / aesDecrypt` 已改为异步 `Promise`
 - 书源入口函数 `search / bookInfo / chapterList / chapterContent / explore / init` 可以返回同步值，也可以返回 Promise；运行时会统一等待结果
@@ -50,6 +52,8 @@ async function search(keyword, page) {
 | `legado.http.get(url, headers?)` | 已异步 | 通过 `NATIVE.httpRequest` 桥接到 ArkTS `HttpClient` |
 | `legado.http.post(url, body, headers?)` | 已异步 | 与 `get` 同路径 |
 | `legado.http.request(...)` | 已异步，但有签名差异 | 见下文“已知差异” |
+| `legado.http.cookies(url)` | 同步 | 从 ArkWeb `WebCookieManager` 读取 URL 可携带 Cookie Header |
+| `legado.http.setCookie(url, cookieText)` | 同步发起 | 写入 ArkWeb `WebCookieManager`，保存过程在原生侧异步完成 |
 | `legado.md5(str)` | 已异步 | 通过 `asyncCrypto` 调到 `Crypto.md5Async` |
 | `legado.sha1(str)` | 已异步 | 同上 |
 | `legado.sha256(str)` | 已异步 | 同上 |
@@ -84,25 +88,24 @@ async function search(keyword, page) {
 | --- | --- |
 | `legado.http.postBinary` | 未实现 |
 | `legado.http.batchGet` | 未实现 |
-| `legado.http.cookies / setCookie` | 未实现 |
 | `legado.image.*` | 未实现 |
 
 如果你的书源依赖以上能力，当前不能认为鸿蒙端已经兼容。
 
 ## 浏览器探测相关说明
 
-鸿蒙端当前的 `legado.browser.*` 不是 Tauri 端那种完整的浏览器探测实现，而是一个**轻量占位版**：
+鸿蒙端当前的 `legado.browser.*` 已接入 ArkWeb WebView 池，不再是占位实现：
 
-- `create / acquire / close` 只是维护内存里的 session
-- `navigate` 本质上仍是走 HTTP 抓取 HTML
-- `eval` 是在抓回来的 HTML 上做轻量 DOM 运行，不是真实页面 JS 环境
-- `cookies()` 当前返回空数组
-- `setCookie()`、`setUserAgent()`、`show()`、`hide()` 当前只是占位返回
+- `create / acquire / show / hide / close` 管理可见或隐藏的 ArkWeb 会话
+- `navigate` 使用 WebView 真实导航
+- `eval / html / text / url` 通过 WebView JavaScript 上下文执行
+- `cookies(url?)` 在 API 23 上通过 `fetchAllCookies(false)` 返回完整 Cookie 对象；传入 URL 时会按 `fetchCookieSync(url, false)` 的可携带结果过滤
+- `setCookie()` 写入 ArkWeb CookieManager，并支持覆盖 HttpOnly
 
 所以：
 
-- 依赖真实登录态、真实浏览器执行环境、真实 WebView Cookie 的书源，当前不能把鸿蒙端 `legado.browser.*` 当成 Tauri 同等级能力
-- 这部分更适合视为“过渡兼容接口”，不是完整浏览器探测能力
+- 依赖真实登录态、真实浏览器执行环境、真实 WebView Cookie 的书源，可以按 `async/await` 方式在鸿蒙端使用
+- 与 Tauri 的主要差异仍是 profile 模型：鸿蒙共享当前 App 的 ArkWeb CookieManager，不提供 Tauri 桌面 `data_directory` 式任意独立 profile
 
 ## 已知差异
 
@@ -147,8 +150,8 @@ legado.http.request(url, opt)
 - 所有哈希和对称加密调用都写成 `await legado.md5(...)`、`await legado.aesDecrypt(...)`、`await legado.desDecrypt(...)`
 - HTML 实体处理和字符集 URL 编码统一写成 `await legado.htmlDecode(...)`、`await legado.urlEncodeCharset(...)`
 - 不要在新书源里继续使用同步网络请求风格
-- 非必要先不要依赖 `postBinary`、`batchGet`、`image`、`http.cookies`
-- 依赖真实浏览器探测的网站，暂时不要把鸿蒙端当成完全兼容平台
+- 非必要先不要依赖 `postBinary`、`batchGet`、`image`
+- 依赖真实浏览器探测的网站，应在鸿蒙端使用 `await legado.browser.*`，并注意 profile 隔离语义与 Tauri 不完全相同
 
 ## 建议模板
 
@@ -184,9 +187,7 @@ async function search(keyword, page) {
 如果后续要继续完善鸿蒙端书源运行时，优先级建议如下：
 
 1. 补齐 `legado.http.postBinary` 与 `legado.http.batchGet`
-2. 补齐 `aesDecryptB64Iv`、`desEncrypt`、`desDecrypt`
-3. 统一 `legado.http.request(options)` 签名
-4. 明确 `http.cookies / setCookie` 的兼容方案
-5. 评估 `legado.image.*` 与浏览器探测能力的鸿蒙实现路径
+2. 统一 `legado.http.request(options)` 签名
+3. 评估 `legado.image.*` 的鸿蒙实现路径
 
 在这些能力补齐之前，本章应视为鸿蒙书源开发的专项限制说明。

@@ -22,10 +22,11 @@ Rust 后端
 - 探测 WebView 使用 `<AppDataDir>/browser_probe_profile/` 独立存储
 - 与主程序 UI WebView 完全隔离
 - 所有书源和扩展共享探测 profile（Cookie、LocalStorage 等共享）
+- CLI 测试模式会启动隐藏的 Tauri 后端，`legado.browser.*` 与 GUI 模式共用同一套 WebView 宿主；隐藏会话不会显示主窗口，`visible: true` 或 `legado.browser.show(id)` 会显示探测窗口
 
 ## init() 自动调用
 
-GUI 模式下，每个书源维护一个独立的长期 Boa Context。书源加载后如果存在无参 `init()` 函数，引擎会自动调用一次：
+GUI 和 CLI 模式都会在构建书源上下文后自动调用无参 `init()` 函数。GUI 模式下，每个书源维护一个独立的长期 Boa Context；CLI 每次命令会创建本次测试使用的 Context：
 
 ```js
 var browserId = '';
@@ -75,9 +76,9 @@ function ensureLogin() {
   }
 
   if (!hasToken) {
-    // 弹出窗口让用户手动登录
-    var ok = legado.browser.open(BASE + '/login');
-    if (!ok) throw new Error('登录未完成');
+    // 显示探测窗口让用户手动登录
+    var id = legado.browser.acquire('login', { visible: true });
+    legado.browser.navigate(id, BASE + '/login', { waitUntil: 'load' });
   }
 }
 ```
@@ -116,6 +117,12 @@ async function chapterContent(chapterUrl) {
 | `'domcontentloaded'` | 只需 DOM 结构，不等待图片等资源 |
 | `'networkidle'` | SPA 页面，需等待 AJAX 请求完成 |
 
+兼容别名：
+
+- `waitFor` 等价于 `waitUntil`。
+- `timeout` 等价于 `timeoutSecs`，单位秒。
+- `timeoutMs` 使用毫秒单位，宿主会向上取整为秒。
+
 ## 调试技巧
 
 在「设置 → 网络 → 浏览器探测」中开启：
@@ -123,3 +130,9 @@ async function chapterContent(chapterUrl) {
 - **调试：强制显示隐藏窗口**：即使 `visible: false`，窗口也会显示
 - 一次性 `legado.browser.run()` 的窗口会保留不关闭
 - 便于观察页面跳转、验证码、JS 执行过程
+
+CLI 中也可以直接调试浏览器探测：
+
+```bash
+legado_tauri cli booksource-eval ./booksources/我的书源.js "legado.browser.run('https://example.com', 'return document.title', { waitUntil: 'load', timeoutSecs: 20 })"
+```

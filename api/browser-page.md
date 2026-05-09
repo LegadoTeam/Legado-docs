@@ -48,13 +48,13 @@ legado.browser.close(id);
 
 ### legado.browser.cookies
 
-读取探测 WebView 的 Cookie（含平台可获取的 HttpOnly Cookie）。
+读取探测 WebView 的 Cookie（含平台可获取的 HttpOnly Cookie）。传入 `url` 时返回该 URL 可携带的 Cookie；不传时返回当前探测 profile 可枚举的全部 Cookie。
 
 ```js
 legado.browser.cookies(url?) → CookieObject[]
 ```
 
-返回 Cookie 对象数组，每个对象包含 `name`、`value` 等字段。
+返回 Cookie 对象数组，每个对象包含 `name`、`value` 等字段；支持的平台还会返回 `domain`、`path`、`expires`、`httpOnly`、`secure`、`sameSite`。
 
 ```js
 var cookies = legado.browser.cookies('https://example.com');
@@ -85,17 +85,18 @@ legado.browser.getCookie(domain, name) → string
 ```
 
 ::: tip Cookie 同步
-书源 HTTP 请求会自动携带 HTTP CookieStore 中对应域名的 Cookie。如果需要将探测 WebView 中获取的 Cookie 用于 HTTP 请求，可以先用 `cookies()` 读取，再通过请求头传递。
+书源 HTTP 请求会自动携带对应域名的 Cookie。Tauri 侧通过 HTTP CookieStore 同步；鸿蒙侧通过 ArkWeb `WebCookieManager` 同步，HTTP 响应里的 `Set-Cookie` 也会写回浏览器 Cookie。
 :::
 
 ### 登录后复用 Cookie
 
 ```js
 function ensureLogin() {
-  var ok = legado.browser.open(BASE + '/login');
-  if (!ok) throw new Error('登录未完成');
+  var id = legado.browser.acquire('login', { visible: true });
+  legado.browser.navigate(id, BASE + '/login', { waitUntil: 'load' });
 
   var cookies = legado.browser.cookies(BASE);
   legado.log('cookies=' + cookies.map(function(c) { return c.name; }).join(','));
+  legado.browser.hide(id);
 }
 ```

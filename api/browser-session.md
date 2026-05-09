@@ -3,18 +3,8 @@
 浏览器探测用于处理普通 HTTP 客户端难以应对的网站（JS 渲染、登录验证、HttpOnly Cookie）。探测 WebView 使用独立 profile，与主程序 UI 隔离。
 
 ::: info CLI 兼容性
-CLI 测试模式会启动隐藏的 Tauri 后端，浏览器探测 API 使用与 GUI 一致的 WebView 宿主。需要人工登录或验证时，`open/show` 仍可能弹出探测窗口。
+CLI 测试模式会启动隐藏的 Tauri 后端，浏览器探测 API 使用与 GUI 一致的 WebView 宿主，可直接通过 `booksource-test` / `booksource-eval` 调试依赖 `legado.browser.*` 的书源。需要人工登录或验证时，`show` 或 `visible: true` 仍可能弹出探测窗口。
 :::
-
-## legado.browser.open
-
-打开可见的探测窗口，供用户手动登录或完成验证。
-
-```js
-legado.browser.open(url) → boolean
-```
-
-用户完成操作并关闭窗口后返回 `true`。
 
 ## legado.browser.create
 
@@ -30,7 +20,11 @@ legado.browser.create(options?) → string
 |------|------|--------|------|
 | `visible` | `boolean` | `false` | 是否显示窗口 |
 | `reuseKey` | `string` | — | 复用标识，相同 key 复用窗口 |
-| `timeout` | `number` | — | 超时秒数 |
+| `userAgent` | `string` | 跟随浏览器探测设置 | 本会话使用的 UA |
+| `width` / `height` | `number` | 平台默认值 | 桌面端探测窗口尺寸 |
+| `timeoutSecs` | `number` | 跟随浏览器探测设置 | 超时秒数 |
+| `timeout` | `number` | — | `timeoutSecs` 的兼容别名，单位秒 |
+| `timeoutMs` | `number` | — | 超时毫秒数，会向上取整为秒 |
 
 ## legado.browser.acquire
 

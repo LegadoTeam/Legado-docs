@@ -19,7 +19,10 @@ legado.browser.navigate(id, url, options?) → void
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `waitUntil` | `string` | `'load'` | 等待条件 |
-| `timeoutSecs` | `number` | — | 超时秒数 |
+| `waitFor` | `string` | — | `waitUntil` 的兼容别名 |
+| `timeoutSecs` | `number` | 跟随浏览器探测设置 | 超时秒数 |
+| `timeout` | `number` | — | `timeoutSecs` 的兼容别名，单位秒 |
+| `timeoutMs` | `number` | — | 超时毫秒数，会向上取整为秒 |
 
 ### waitUntil 值
 
@@ -41,7 +44,7 @@ legado.browser.eval(id, code, options?) → any
 |------|------|------|
 | `id` | `string` | 会话 ID |
 | `code` | `string` | 要执行的 JS 代码 |
-| `options` | `object` | `{ timeoutSecs? }` |
+| `options` | `object` | `{ timeoutSecs?, timeout?, timeoutMs? }` |
 
 **返回值**：代码执行结果（JSON 反序列化后的值）。
 
@@ -72,7 +75,7 @@ legado.browser.run(url, code, options?) → any
 |------|------|------|
 | `url` | `string` | 目标页面 URL |
 | `code` | `string` | 要执行的 JS 代码 |
-| `options` | `object` | `{ visible?, waitUntil?, timeoutSecs? }` |
+| `options` | `object` | `{ visible?, waitUntil?, waitFor?, timeoutSecs?, timeout?, timeoutMs? }` |
 
 ### 示例：动态页面搜索
 

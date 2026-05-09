@@ -328,7 +328,7 @@ legado.browser.navigate(id, url);
 var html = legado.browser.html(id);
 ```
 
-> ℹ️ CLI 模式会启动隐藏的 Tauri 后端，书源脚本使用与 GUI 一致的宿主环境。浏览器探测 API 可在 CLI 测试中使用；需要人工登录或验证时，`open/show` 仍可能弹出探测窗口。
+> ℹ️ CLI 模式会启动隐藏的 Tauri 后端，书源脚本使用与 GUI 一致的宿主环境。浏览器探测 API 可在 CLI 测试中使用；需要人工登录或验证时，`visible: true` 或 `show` 仍可能弹出探测窗口。
 >
 > 📖 详见：[api/browser-session](../api/browser-session.md) · [api/browser-navigate](../api/browser-navigate.md) · [api/browser-page](../api/browser-page.md) · [advanced/browser-probe](../advanced/browser-probe.md)
 
