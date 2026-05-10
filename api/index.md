@@ -58,6 +58,7 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 | [`legado.browser.run(url, code, options?)`](/api/browser-navigate) | 一次性导航 + 执行 |
 | [`legado.browser.html(id)` / `text(id)` / `url(id)`](/api/browser-page) | 读取页面内容 |
 | [`legado.browser.cookies(url?)`](/api/browser-page) | 读取 Cookie |
+| [`legado.browser.postMessage/request/waitMessage`](/api/browser-bridge) | Boa 与探测页面双向通信 |
 
 ### 图片处理 {#image}
 

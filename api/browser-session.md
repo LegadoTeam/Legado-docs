@@ -25,6 +25,7 @@ legado.browser.create(options?) → string
 | `timeoutSecs` | `number` | 跟随浏览器探测设置 | 超时秒数 |
 | `timeout` | `number` | — | `timeoutSecs` 的兼容别名，单位秒 |
 | `timeoutMs` | `number` | — | 超时毫秒数，会向上取整为秒 |
+| `muted` | `boolean` | `false` | 创建时即静音，屏蔽音频输出 |
 
 ## legado.browser.acquire
 
@@ -70,3 +71,50 @@ legado.browser.close(id)  // 关闭并销毁会话
 ```js
 legado.browser.setUserAgent(ua)
 ```
+
+---
+
+## 静音控制
+
+静音后探测 WebView 的音频输出被完全屏蔽，不会播放页面内嵌的视频/音频，适合后台抓包场景。
+
+### legado.browser.mute
+
+```js
+legado.browser.mute(id) → void
+```
+
+### legado.browser.unmute
+
+```js
+legado.browser.unmute(id) → void
+```
+
+### legado.browser.setMuted
+
+```js
+legado.browser.setMuted(id, muted) → void
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `id` | `string` | 会话 ID |
+| `muted` | `boolean` | `true` 静音，`false` 取消静音 |
+
+### 示例
+
+```js
+// 创建时直接静音
+var id = legado.browser.create({ visible: false, muted: true });
+
+// 或运行时切换
+legado.browser.mute(id);
+legado.browser.navigate(id, url, { waitUntil: 'networkidle' });
+var html = legado.browser.html(id);
+legado.browser.close(id);
+```
+
+::: info 平台说明
+- **Tauri/桌面**：WebView2（Windows）通过 `put_IsMuted`；WebKit（macOS/Linux）通过 `setPageMuted`。
+- **鸿蒙**：ArkWeb `WebController.setAudioMuted()`。
+:::

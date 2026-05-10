@@ -104,6 +104,7 @@ export default defineConfig({
             { text: '会话管理（acquire / create）', link: '/api/browser-session' },
             { text: '导航与 eval', link: '/api/browser-navigate' },
             { text: '页面读取与 Cookie', link: '/api/browser-page' },
+            { text: 'Boa 双向通信', link: '/api/browser-bridge' },
           ],
         },
         {

@@ -100,3 +100,103 @@ function ensureLogin() {
   legado.browser.hide(id);
 }
 ```
+
+---
+
+## 网络请求回调
+
+监听探测会话内所有出站请求与响应，回调包含完整的请求头、响应头及响应体，可用于抓取 API 接口数据、捕获加密参数或追踪重定向链。
+
+### legado.browser.onRequest
+
+```js
+legado.browser.onRequest(id, handler) → void
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `id` | `string` | 会话 ID |
+| `handler` | `function(event)` | 每次请求/响应触发，接收 `RequestEvent` 对象 |
+
+#### RequestEvent 结构
+
+```ts
+interface RequestEvent {
+  type: 'request' | 'response'  // 请求阶段 或 响应阶段
+  url: string                   // 请求 URL
+  method: string                // HTTP 方法，如 'GET' / 'POST'
+  resourceType: string          // 资源类型，如 'xhr' / 'fetch' / 'document' / 'script'
+  requestHeaders: Record<string, string>  // 原始请求头
+  requestBody?: string          // POST 请求体（文本形式）
+
+  // 以下字段仅 type === 'response' 时存在
+  status?: number               // HTTP 状态码
+  responseHeaders?: Record<string, string>  // 响应头
+  responseBody?: string         // 响应体（文本形式，二进制资源为 null）
+}
+```
+
+### legado.browser.offRequest
+
+移除会话的网络请求监听。
+
+```js
+legado.browser.offRequest(id) → void
+```
+
+### 示例：捕获 XHR/Fetch 接口返回
+
+```js
+async function getApiData(pageUrl) {
+  var id = legado.browser.create({ visible: false, muted: true });
+  var captured = null;
+
+  legado.browser.onRequest(id, function(event) {
+    if (event.type === 'response'
+        && event.url.includes('/api/chapter')
+        && event.responseBody) {
+      captured = JSON.parse(event.responseBody);
+    }
+  });
+
+  legado.browser.navigate(id, pageUrl, { waitUntil: 'networkidle' });
+  legado.browser.offRequest(id);
+  legado.browser.close(id);
+
+  return captured;
+}
+```
+
+### 示例：记录完整请求日志
+
+```js
+var id = legado.browser.create({ visible: false });
+
+legado.browser.onRequest(id, function(event) {
+  if (event.type === 'request') {
+    legado.log('[REQ] ' + event.method + ' ' + event.url);
+    legado.log('      headers=' + JSON.stringify(event.requestHeaders));
+  } else {
+    legado.log('[RES] ' + event.status + ' ' + event.url);
+    legado.log('      headers=' + JSON.stringify(event.responseHeaders));
+  }
+});
+
+legado.browser.navigate(id, 'https://example.com', { waitUntil: 'networkidle' });
+legado.browser.offRequest(id);
+legado.browser.close(id);
+```
+
+::: info 平台兼容性
+| 平台 | 实现机制 | 响应体 | 请求体 |
+|------|----------|--------|--------|
+| Tauri/Windows (WebView2) | `AddWebResourceRequestedFilter` + `WebResourceResponseReceived` | ✅ | ✅ |
+| Tauri/macOS、Linux (WebKit) | `webkit-web-view` `decide-policy` + `resource-load-finished` | 部分（text 类型）| ✅ |
+| 鸿蒙 (ArkWeb) | `onInterceptRequest` + `WebResourceResponse` | ✅ | ✅ |
+
+二进制资源（图片、视频流等）的 `responseBody` 为 `null`，仅文本类型（JSON、HTML、XML 等）会填充响应体。
+:::
+
+::: warning 注意
+回调在书源 JS 上下文同步触发。不要在 handler 内执行阻塞性 IO 或死循环，避免影响页面加载超时计算。
+:::

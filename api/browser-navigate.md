@@ -32,6 +32,11 @@ var session = legado.browser2.acquire(role, options?)  // 按角色复用会话
 | `.setUserAgent(ua)` | `void` | 设置 UA |
 | `.show()` | `void` | 显示探测窗口 |
 | `.hide()` | `void` | 隐藏探测窗口 |
+| `.mute()` | `void` | 静音 |
+| `.unmute()` | `void` | 取消静音 |
+| `.setMuted(muted)` | `void` | 设置静音状态 |
+| `.onRequest(handler)` | `void` | 注册网络请求/响应回调 |
+| `.offRequest()` | `void` | 移除网络请求回调 |
 | `.close()` | `void` | 关闭会话，释放资源 |
 
 ### legado.browser2.run
