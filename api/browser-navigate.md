@@ -1,6 +1,85 @@
 # 浏览器探测 — 导航与执行
 
-## legado.browser.navigate
+`legado.browser` 是句柄风格 API；`legado.browser2` 是对象风格封装，推荐优先使用。两者功能等价，可混用。
+
+## legado.browser2（对象风格，推荐）
+
+### 创建会话
+
+```js
+var session = legado.browser2.create(options?)   // 新建独立会话
+var session = legado.browser2.acquire(role, options?)  // 按角色复用会话
+```
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `options` | `object` | `{ visible?, reuseKey? }` |
+| `role` | `string` | 会话角色标识，相同 role 复用同一会话 |
+
+返回 `BrowserSession` 对象。
+
+### BrowserSession 方法
+
+| 方法 | 返回 | 说明 |
+|------|------|------|
+| `.navigate(url, options?)` | `void` | 导航到 URL 并等待加载 |
+| `.eval(code, options?)` | `any` | 在页面执行 JS |
+| `.html()` | `string` | 当前页面 HTML |
+| `.text()` | `string` | 当前页面纯文本 |
+| `.url()` | `string` | 当前页面 URL |
+| `.cookies(cookieUrl?)` | `array` | 获取 Cookie 列表 |
+| `.setCookie(cookieUrl, cookie)` | `void` | 设置 Cookie |
+| `.setUserAgent(ua)` | `void` | 设置 UA |
+| `.show()` | `void` | 显示探测窗口 |
+| `.hide()` | `void` | 隐藏探测窗口 |
+| `.close()` | `void` | 关闭会话，释放资源 |
+
+### legado.browser2.run
+
+一次性操作，与 `legado.browser.run` 等价：
+
+```js
+legado.browser2.run(url, code, options?) → any
+```
+
+### 示例：对象风格多步骤会话
+
+```js
+async function chapterContent(chapterUrl) {
+  if (!globalThis._contentSession) {
+    globalThis._contentSession = legado.browser2.create({ visible: false });
+  }
+  var session = globalThis._contentSession;
+
+  try {
+    session.navigate(chapterUrl, { waitUntil: 'load' });
+    return session.eval(`
+      await new Promise(function(resolve) { setTimeout(resolve, 500); });
+      return document.querySelector('#content')?.innerText || '';
+    `);
+  } catch (e) {
+    session.close();
+    globalThis._contentSession = null;
+    throw e;
+  }
+}
+```
+
+### 示例：acquire 角色复用
+
+```js
+async function getPageHtml(url) {
+  var session = legado.browser2.acquire('main', { visible: false });
+  session.navigate(url, { waitUntil: 'networkidle' });
+  return session.html();
+}
+```
+
+---
+
+## legado.browser（句柄风格）
+
+### legado.browser.navigate
 
 导航会话到指定 URL 并等待加载完成。
 
@@ -101,7 +180,7 @@ async function search(keyword, page) {
 }
 ```
 
-### 示例：多步骤会话
+### 示例：多步骤会话（句柄风格）
 
 ```js
 async function chapterContent(chapterUrl) {
