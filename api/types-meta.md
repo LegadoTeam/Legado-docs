@@ -12,7 +12,7 @@
 | `@author` | `author` | `string?` | 推荐 | 书源作者 |
 | `@logo` | `logo` | `string?` | 否 | 图标 URL |
 | `@group` | `group` | `string?` | 否 | 分组 |
-| `@type` | — | `string` | 否 | 类型：`comic` / `video`，默认小说 |
+| `@type` | — | `string` | 否 | 类型：`novel`（默认）/ `comic` / `video` / `music` |
 | `@enabled` | `enabled` | `boolean` | 否 | 启用状态，默认 `true` |
 | `@minDelay` | `minDelayMs` | `number` | 否 | 最小请求间隔（毫秒） |
 | `@tags` | — | `string` | 否 | 标签（逗号分隔），第一个值作 UI 分组 |

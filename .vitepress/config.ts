@@ -29,7 +29,7 @@ export default defineConfig({
     sidebar: {
       '/guide/': [
         {
-          text: '开始',
+          text: '入门',
           items: [
             { text: '简介', link: '/guide/introduction' },
             { text: '快速开始', link: '/guide/getting-started' },
@@ -37,21 +37,22 @@ export default defineConfig({
           ],
         },
         {
-          text: '基础开发',
+          text: '五大核心函数',
           items: [
-            { text: '搜索 (search)', link: '/guide/search' },
-            { text: '书籍详情 (bookInfo)', link: '/guide/book-info' },
-            { text: '章节目录 (chapterList)', link: '/guide/chapter-list' },
-            { text: '章节正文 (chapterContent)', link: '/guide/chapter-content' },
-            { text: '发现页 (explore)', link: '/guide/explore' },
+            { text: 'search — 搜索', link: '/guide/search' },
+            { text: 'bookInfo — 书籍详情', link: '/guide/book-info' },
+            { text: 'chapterList — 章节目录', link: '/guide/chapter-list' },
+            { text: 'chapterContent — 章节正文', link: '/guide/chapter-content' },
+            { text: 'explore — 发现页', link: '/guide/explore' },
           ],
         },
         {
-          text: '不同类型书源',
+          text: '书源类型',
           items: [
             { text: '小说书源', link: '/guide/type-novel' },
             { text: '漫画书源', link: '/guide/type-comic' },
             { text: '视频书源', link: '/guide/type-video' },
+            { text: '音乐 / 有声书源', link: '/guide/type-music' },
           ],
         },
         {
@@ -59,68 +60,71 @@ export default defineConfig({
           items: [
             { text: 'CLI 测试工具', link: '/guide/cli-testing' },
             { text: '调试技巧', link: '/guide/debugging' },
+          ],
+        },
+        {
+          text: '发布与分享',
+          items: [
             { text: '社区书源仓库规范', link: '/guide/community-booksource-repository' },
-            { text: '在线书源仓库（临时测试）', link: '/guide/online-booksources' },
+            { text: '在线书源仓库', link: '/guide/online-booksources' },
           ],
         },
       ],
 
       '/api/': [
         {
-          text: 'API 参考',
-          items: [{ text: '总览', link: '/api/' }],
+          text: 'API 总览',
+          items: [{ text: '索引', link: '/api/' }],
         },
         {
           text: 'HTTP 请求',
           items: [
-            { text: 'legado.http.get', link: '/api/http-get' },
-            { text: 'legado.http.post', link: '/api/http-post' },
-            { text: 'legado.http.postBinary', link: '/api/http-post-binary' },
-            { text: 'legado.http.batchGet', link: '/api/http-batch-get' },
-            { text: 'legado.http.request', link: '/api/http-request' },
+            { text: 'http.get', link: '/api/http-get' },
+            { text: 'http.post', link: '/api/http-post' },
+            { text: 'http.postBinary', link: '/api/http-post-binary' },
+            { text: 'http.batchGet', link: '/api/http-batch-get' },
+            { text: 'http.request（高级）', link: '/api/http-request' },
+            { text: 'fetch / Headers / FormData', link: '/api/http-fetch' },
           ],
         },
         {
           text: 'DOM 解析',
           items: [
-            { text: 'legado.dom.parse', link: '/api/dom-parse' },
-            { text: 'legado.dom.select / selectAll', link: '/api/dom-select' },
-            { text: 'legado.dom.text / html / attr', link: '/api/dom-text' },
-            { text: 'legado.dom 快捷方法', link: '/api/dom-shortcuts' },
-            { text: 'legado.dom 工具方法', link: '/api/dom-utils' },
-            { text: 'legado.dom2（对象风格兼容层,优先使用）', link: '/api/dom2' },
-          ],
-        },
-        {
-          text: '编码与加密',
-          items: [
-            { text: '编码函数', link: '/api/encoding' },
-            { text: '哈希函数', link: '/api/hash' },
-            { text: '加密/解密', link: '/api/crypto' },
+            { text: 'dom2（推荐，对象风格）', link: '/api/dom2' },
+            { text: 'dom.parse / free', link: '/api/dom-parse' },
+            { text: 'dom.select / selectAll', link: '/api/dom-select' },
+            { text: 'dom.text / html / attr', link: '/api/dom-text' },
+            { text: 'dom 快捷方法', link: '/api/dom-shortcuts' },
+            { text: 'dom 工具方法', link: '/api/dom-utils' },
           ],
         },
         {
           text: '浏览器探测',
           items: [
-            { text: '会话管理', link: '/api/browser-session' },
-            { text: '导航与执行', link: '/api/browser-navigate' },
+            { text: '会话管理（acquire / create）', link: '/api/browser-session' },
+            { text: '导航与 eval', link: '/api/browser-navigate' },
             { text: '页面读取与 Cookie', link: '/api/browser-page' },
           ],
         },
         {
-          text: '图片处理',
-          items: [{ text: 'legado.image.*', link: '/api/image' }],
-        },
-        {
-          text: '设备标识',
-          items: [{ text: 'getMachineUid / getMachineUUID', link: '/api/device-id' }],
-        },
-        {
-          text: '其他',
+          text: '编码 / 加密 / 哈希',
           items: [
-            { text: 'legado.log / toast', link: '/api/log' },
-            { text: 'legado.config.*', link: '/api/config' },
-            { text: 'legado.ui.emit', link: '/api/ui-emit' },
+            { text: '编码函数', link: '/api/encoding' },
+            { text: '哈希函数', link: '/api/hash' },
+            { text: '加密 / 解密', link: '/api/crypto' },
+          ],
+        },
+        {
+          text: '图片处理',
+          items: [{ text: 'image.*', link: '/api/image' }],
+        },
+        {
+          text: '工具 / 其他',
+          items: [
+            { text: 'log / toast', link: '/api/log' },
+            { text: 'config.*', link: '/api/config' },
+            { text: 'ui.emit', link: '/api/ui-emit' },
+            { text: '设备标识', link: '/api/device-id' },
           ],
         },
         {
@@ -128,21 +132,37 @@ export default defineConfig({
           items: [
             { text: 'BookItem', link: '/api/types-book-item' },
             { text: 'ChapterInfo', link: '/api/types-chapter' },
-            { text: '元数据字段', link: '/api/types-meta' },
+            { text: '书源元数据字段', link: '/api/types-meta' },
           ],
         },
       ],
 
       '/advanced/': [
         {
-          text: '进阶',
+          text: '浏览器探测',
           items: [
             { text: '浏览器探测实战', link: '/advanced/browser-probe' },
-            { text: '鸿蒙兼容性与异步语义', link: '/advanced/harmony-async' },
+            { text: 'Cloudflare 挑战绕过', link: '/advanced/cloudflare-bypass' },
+          ],
+        },
+        {
+          text: '功能扩展',
+          items: [
             { text: 'HTML 交互发现页', link: '/advanced/html-explore' },
             { text: '图片处理 (processImage)', link: '/advanced/process-image' },
             { text: '脚本配置持久化', link: '/advanced/script-config' },
             { text: '内置单元测试 (TEST)', link: '/advanced/unit-test' },
+          ],
+        },
+        {
+          text: '平台兼容',
+          items: [
+            { text: '鸿蒙兼容性与异步语义', link: '/advanced/harmony-async' },
+          ],
+        },
+        {
+          text: '规范',
+          items: [
             { text: '最佳实践', link: '/advanced/best-practices' },
           ],
         },
