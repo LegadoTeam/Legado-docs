@@ -19,6 +19,19 @@ legado_tauri cli booksource-test <文件> <操作> [参数...]
 legado_tauri cli booksource-eval <文件> <代码>
 ```
 
+## 纯 Node.js 模拟环境
+
+快速开发时可以使用纯 Node.js 书源宿主模拟器。它不启动 Tauri，也不调用 Rust 主程序：
+
+```bash
+pnpm booksource:node:test <文件> search 斗破苍穹 1
+pnpm booksource:node:test <文件> all 斗破苍穹
+pnpm booksource:node:eval <文件> "await search('斗破苍穹', 1)"
+node scripts/booksource-node-runtime.mjs --watch eval <文件> --code-file ./tmp/debug.js
+```
+
+该模拟器会注入 `legado.http/config/browser/dom/dom2/image/runtime/ui`、`btoa/atob/html`、`fetch/Request/Response/Headers/FormData/URLSearchParams` 等接口，调用约定与 CLI 的 `init/search/bookInfo/chapterList/chapterContent/explore` 对齐。HTTP、Cookie、配置、基础 DOM、哈希/AES 等能力由 Node 原生实现；浏览器探测用 `fetch + document` 轻量模拟，适合快速验证解析逻辑，但无法完全等价真实 WebView 的登录、验证码、Cloudflare 和复杂 JS 渲染。最终发布前仍建议用上面的 Tauri CLI 做一次复核。
+
 ### 文件参数格式
 
 | 形式 | 示例 | 说明 |
