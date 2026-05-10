@@ -148,3 +148,87 @@ async function chapterContent(chapterUrl) {
   return chapterUrl;
 }
 ```
+
+## 通用分类面板（线路 / 画质 / 语言等）
+
+`chapterContent()` 可在返回的 JSON 中携带 `categories` 字段，指示应用在播放器侧边栏（桌面）或底部条（移动端）渲染可交互的分类选择面板。用户点击某个选项后，应用会用新的 `selectedCategories` 参数再次调用 `chapterContent()`，书源根据参数返回对应播放地址。
+
+### 返回格式
+
+```ts
+interface VideoCategoryOption {
+  id: string;       // 选项唯一标识，传回给书源的值
+  label: string;    // 显示文字
+  badge?: string;   // 右上角小标，如 '4K'、'新'
+}
+
+interface VideoCategoryGroup {
+  id: string;              // 分组唯一标识
+  label: string;           // 分组标题，如 '线路'、'画质'
+  options: VideoCategoryOption[];
+  defaultSelected?: string; // 初始选中的 option.id（默认第一项）
+}
+
+interface VideoContentResult {
+  url: string;
+  type?: 'hls' | 'dash' | 'mp4' | 'flv';
+  headers?: Record<string, string>;
+  qualities?: { label: string; url: string }[];
+  subtitles?: { label: string; url: string; srclang?: string; default?: boolean }[];
+  categories?: VideoCategoryGroup[];  // 新字段
+}
+```
+
+### 函数签名
+
+```js
+async function chapterContent(chapterUrl, selectedCategories) {
+  //                                      ^^^^^^^^^^^^^^^^^^^
+  //   第二参数：{ [groupId]: optionId }，初次调用时为 undefined
+}
+```
+
+### 多线路 + 画质示例
+
+```js
+async function chapterContent(chapterUrl, selectedCategories) {
+  var route   = (selectedCategories && selectedCategories.route)   || 's1';
+  var quality = (selectedCategories && selectedCategories.quality) || '1080p';
+
+  var resp = await legado.http.get(
+    'https://api.example.com/play?url=' + encodeURIComponent(chapterUrl)
+    + '&route=' + route + '&quality=' + quality
+  );
+  var json = JSON.parse(resp);
+
+  return JSON.stringify({
+    url: json.playUrl,
+    type: 'hls',
+    categories: [
+      {
+        id: 'route',
+        label: '线路',
+        defaultSelected: route,
+        options: [
+          { id: 's1', label: '主线路', badge: '推荐' },
+          { id: 's2', label: '备用线路' },
+          { id: 's3', label: '海外线路' }
+        ]
+      },
+      {
+        id: 'quality',
+        label: '画质',
+        defaultSelected: quality,
+        options: [
+          { id: '4k',   label: '超清', badge: '4K' },
+          { id: '1080p', label: '蓝光 1080P' },
+          { id: '720p',  label: '高清 720P' },
+          { id: '480p',  label: '标清 480P' }
+        ]
+      }
+    ]
+  });
+}
+```
+
+> **向后兼容**：`selectedCategories` 参数是可选的，不使用分类功能的书源无需修改。

@@ -153,3 +153,33 @@ async function chapterContent(chapterUrl) {
   });
 }
 ```
+
+### 视频分类面板（线路 / 画质 / 语言）
+
+视频书源可在 JSON 返回值中附加 `categories` 字段，应用会在播放器界面渲染可交互的分类选择面板。用户选择后，应用以 **第二参数** `selectedCategories` 回调 `chapterContent()`，书源据此返回对应播放地址。
+
+```js
+// 函数签名（第二参数初次调用时为 undefined）
+async function chapterContent(chapterUrl, selectedCategories) {
+  var route = (selectedCategories && selectedCategories.route) || 's1';
+
+  var playUrl = await fetchVideoUrl(chapterUrl, route);
+
+  return JSON.stringify({
+    url: playUrl,
+    type: 'hls',
+    categories: [{
+      id: 'route',
+      label: '切换线路',
+      defaultSelected: route,
+      options: [
+        { id: 's1', label: '线路一', badge: '推荐' },
+        { id: 's2', label: '线路二' },
+        { id: 's3', label: '线路三' }
+      ]
+    }]
+  });
+}
+```
+
+详细说明见 [视频书源 → 通用分类面板](./type-video.md#通用分类面板线路--画质--语言等)。
