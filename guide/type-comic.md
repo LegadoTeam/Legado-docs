@@ -1,10 +1,10 @@
-# 漫画书源
+# 漫画书源（comic）
 
 漫画书源需要在元数据中标记 `// @type comic`。
 
 ## 关键差异
 
-- 必须标记 `// @type comic`
+- 必须标记 `// @type comic`（中文别名：`漫画`）
 - `chapterContent()` 返回 `JSON.stringify(imageUrls)`（图片 URL 数组）
 - 可选实现 `processImage()` 回调处理图片（解密、拼接等）
 - 第 1 话如果 `href="javascript:;"`，需映射为 `tocUrl`

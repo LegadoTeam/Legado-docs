@@ -191,6 +191,7 @@ legado.browser.close(id);
 | 平台 | 实现机制 | 响应体 | 请求体 |
 |------|----------|--------|--------|
 | Tauri/Windows (WebView2) | `AddWebResourceRequestedFilter` + `WebResourceResponseReceived` | ✅ | ✅ |
+| Tauri/Android (WebView) | `shouldInterceptRequest` 原生拦截；GET/HEAD 由宿主代理后回填给 WebView | ✅（文本响应；二进制为 null） | 部分（Android WebView 原生 API 不暴露请求体） |
 | Tauri/macOS、Linux (WebKit) | `webkit-web-view` `decide-policy` + `resource-load-finished` | 部分（text 类型）| ✅ |
 | 鸿蒙 (ArkWeb) | `onInterceptRequest` + `WebResourceResponse` | ✅ | ✅ |
 

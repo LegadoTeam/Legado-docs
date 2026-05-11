@@ -98,6 +98,10 @@ await legado.browser.handleNextMessage(id, { timeoutSecs: 30 });
 
 `legado.browser2` 的 `BrowserSession` 对象提供同名实例方法。
 
+::: info 平台说明
+Tauri/Windows 与 Tauri/Android 均会向探测页面注入 `window.legadoBridge`，Android 侧通过原生 WebView `JavascriptInterface` 与 Rust/Boa 队列转发消息，API 形态与桌面端一致。
+:::
+
 ::: warning 避免互相等待
 `legado.browser.request` 会阻塞当前 Boa 调用直到页面返回；不要在它触发的页面 handler 内再调用 `requestHost` 等待同一个 Boa 调用回复。需要页面主动请求 Boa 时，先让页面事件进入队列，再在书源函数中调用 `waitMessage` / `handleNextMessage` 处理。
 :::

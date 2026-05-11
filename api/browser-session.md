@@ -116,5 +116,6 @@ legado.browser.close(id);
 
 ::: info 平台说明
 - **Tauri/桌面**：WebView2（Windows）通过 `put_IsMuted`；WebKit（macOS/Linux）通过 `setPageMuted`。
+- **Tauri/Android**：通过探测 WebView 注入媒体静音兜底脚本。
 - **鸿蒙**：ArkWeb `WebController.setAudioMuted()`。
 :::
