@@ -43,6 +43,39 @@ async function chapterContent(chapterUrl) {
 }
 ```
 
+### 格式三：内联 m3u8 文本内容
+
+当书源需要**修改 m3u8 片段列表**时（如修复相对路径、替换 CDN 域名、过滤广告片段），可直接返回 m3u8 文本内容或通过 JSON 的 `m3u8Content` 字段返回，无需搭建代理中转。
+
+**方式 A：直接返回 m3u8 文本**（以 `#EXTM3U` 开头即可识别）：
+
+```js
+async function chapterContent(chapterUrl) {
+  var m3u8Text = await legado.http.get(chapterUrl);
+  // 将相对路径片段补全为绝对 URL
+  var base = chapterUrl.substring(0, chapterUrl.lastIndexOf('/') + 1);
+  m3u8Text = m3u8Text.replace(/^(?!#)(.+\.ts.*)$/mg, base + '$1');
+  return m3u8Text;  // 直接返回修改后的 m3u8 文本
+}
+```
+
+**方式 B：通过 JSON 的 `m3u8Content` 字段返回**（可同时附带请求头等其他选项）：
+
+```js
+async function chapterContent(chapterUrl) {
+  var m3u8Text = await legado.http.get(chapterUrl);
+  // 替换 CDN 域名
+  m3u8Text = m3u8Text.replace(/https:\/\/old-cdn\.com/g, 'https://new-cdn.com');
+  return JSON.stringify({
+    m3u8Content: m3u8Text,
+    // url 可省略，App 会自动从 m3u8Content 生成 Blob URL
+    headers: { Referer: 'https://example.com' }  // 其他选项照常生效
+  });
+}
+```
+
+> **注意**：`m3u8Content` 中的片段 URL 必须是绝对 URL（即 `http://` 或 `https://` 开头）。如果原始 m3u8 使用相对路径，需要在书源中手动拼接为绝对路径（如方式 A 示例）。
+
 ## 多线路分组
 
 视频站点通常有多条播放线路，通过 `group` 字段分组：

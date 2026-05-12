@@ -284,6 +284,17 @@ return JSON.stringify({
   headers: { 'Referer': 'https://example.com' }
 });
 ```
+**内联 m3u8 文本**（书源需要修改 m3u8 片段列表时，直接返回修改后的内容）：
+```js
+// 方式 A：直接返回 m3u8 文本（以 #EXTM3U 开头自动识别）
+var m3u8Text = await legado.http.get(chapterUrl);
+var base = chapterUrl.substring(0, chapterUrl.lastIndexOf('/') + 1);
+m3u8Text = m3u8Text.replace(/^(?!#)(.+\.ts.*)$/mg, base + '$1');
+return m3u8Text;
+
+// 方式 B：通过 JSON 的 m3u8Content 字段返回（可同时附加 headers 等选项）
+return JSON.stringify({ m3u8Content: m3u8Text, headers: { Referer: 'https://example.com' } });
+```
 苹果 CMS 站通常 `chapterUrl` 本身就是播放直链，直接 `return chapterUrl`。
 :::
 
