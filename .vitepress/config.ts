@@ -70,6 +70,12 @@ export default defineConfig({
             { text: '在线书源仓库', link: '/guide/online-booksources' },
           ],
         },
+        {
+          text: '更新日志',
+          items: [
+            { text: 'API 更新日志', link: '/guide/changelog' },
+          ],
+        },
       ],
 
       '/api/': [

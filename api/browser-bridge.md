@@ -2,6 +2,18 @@
 
 探测页面会注入 `window.legadoBridge`。书源 Boa 侧通过 `legado.browser.*` 与页面实时交换 JSON 数据；页面侧可以注册异步 handler，也可以主动向 Boa 发送消息并等待响应。
 
+::: tip 会话创建
+使用双向通信前需要先获取会话 ID。推荐用 [`legado.browser.acquire`](/api/browser-session)——每次传入相同的角色名，引擎自动决定创建还是复用，无需脚本保存 ID 或手动 close：
+
+```js
+// 在任意函数中调用，传相同 role 即可复用同一窗口
+var id = legado.browser.acquire('content');
+legado.browser.navigate(id, url, { waitUntil: 'load' });
+```
+
+对象风格（`legado.browser2`）可省略 `id` 参数，详见[导航与执行](/api/browser-navigate)。
+:::
+
 ## Boa → 浏览器页面
 
 ### legado.browser.postMessage
@@ -93,10 +105,11 @@ await legado.browser.handleNextMessage(id, { timeoutSecs: 30 });
 | `respondMessage(id, requestId, value?)` | 回复页面 `requestHost` |
 | `respondMessageError(id, requestId, error)` | 以错误回复页面 `requestHost` |
 | `onMessage(id, handler)` | 注册 Boa 侧消息 handler |
+| `offMessage(id)` | 移除 Boa 侧消息 handler |
 | `pumpMessages(id)` | 读取当前队列并逐条调用 handler |
 | `handleNextMessage(id, options?)` | 等待一条消息并调用 handler |
 
-`legado.browser2` 的 `BrowserSession` 对象提供同名实例方法。
+`legado.browser2` 的 `BrowserSession` 对象提供同名实例方法（省略 `id` 参数）。
 
 ::: info 平台说明
 Tauri/Windows 与 Tauri/Android 均会向探测页面注入 `window.legadoBridge`，Android 侧通过原生 WebView `JavascriptInterface` 与 Rust/Boa 队列转发消息，API 形态与桌面端一致。

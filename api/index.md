@@ -51,14 +51,15 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 
 | API | 说明 |
 |-----|------|
-| [`legado.browser.create(options?)`](/api/browser-session) | 创建探测会话 |
-| [`legado.browser.acquire(role, options?)`](/api/browser-session) | 获取命名会话 |
+| [`legado.browser.acquire(role, options?)`](/api/browser-session) | **推荐**：按角色获取/复用会话，引擎自动管理生命周期 |
+| [`legado.browser.create(options?)`](/api/browser-session) | 创建探测会话（底层，非必要不使用） |
 | [`legado.browser.navigate(id, url, options?)`](/api/browser-navigate) | 导航到 URL |
 | [`legado.browser.eval(id, code, options?)`](/api/browser-navigate) | 执行页面 JS |
 | [`legado.browser.run(url, code, options?)`](/api/browser-navigate) | 一次性导航 + 执行 |
 | [`legado.browser.html(id)` / `text(id)` / `url(id)`](/api/browser-page) | 读取页面内容 |
-| [`legado.browser.cookies(url?)`](/api/browser-page) | 读取 Cookie |
+| [`legado.browser.cookies(url?)` / `getCookie(domain, name)`](/api/browser-page) | 读取 Cookie |
 | [`legado.browser.postMessage/request/waitMessage`](/api/browser-bridge) | Boa 与探测页面双向通信 |
+| [`legado.browser2.acquire(role, options?)`](/api/browser-navigate) | 对象风格 `acquire`，返回 `BrowserSession` |
 
 ### 图片处理 {#image}
 

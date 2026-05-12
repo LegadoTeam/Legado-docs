@@ -16,7 +16,7 @@ hero:
       text: GitHub
       link: https://github.com/LegadoTeam/Legado-Tauri
     - theme: alt
-      text: QQ 交流群：645815655
+      text: QQ 交流群：645815655(已满)  949235656
       # link: https://qm.qq.com/q/xxxxxx
 features:
   - icon: 📖

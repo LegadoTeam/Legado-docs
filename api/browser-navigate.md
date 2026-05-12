@@ -4,17 +4,18 @@
 
 ## legado.browser2（对象风格，推荐）
 
-### 创建会话
+### 获取会话
 
 ```js
-var session = legado.browser2.create(options?)   // 新建独立会话
-var session = legado.browser2.acquire(role, options?)  // 按角色复用会话
+var session = legado.browser2.acquire(role, options?)  // 按角色复用会话（推荐）
+var session = legado.browser2.create(options?)         // 新建独立会话（非必要不使用）
+var session = legado.browser2.fromId(id)               // 从底层句柄 ID 包装
 ```
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `options` | `object` | `{ visible?, reuseKey? }` |
-| `role` | `string` | 会话角色标识，相同 role 复用同一会话 |
+| `role` | `string` | 会话角色标识，相同 role 复用同一会话，引擎自动管理生命周期 |
+| `options` | `object` | 可选，同 `create` 的 options |
 
 返回 `BrowserSession` 对象。
 
@@ -35,9 +36,17 @@ var session = legado.browser2.acquire(role, options?)  // 按角色复用会话
 | `.mute()` | `void` | 静音 |
 | `.unmute()` | `void` | 取消静音 |
 | `.setMuted(muted)` | `void` | 设置静音状态 |
-| `.onRequest(handler)` | `void` | 注册网络请求/响应回调 |
+| `.onRequest(handler, options?)` | `void` | 注册网络请求/响应回调；options 同 `legado.browser.onRequest` |
 | `.offRequest()` | `void` | 移除网络请求回调 |
-| `.close()` | `void` | 关闭会话，释放资源 |
+| `.postMessage(type, data?)` | `void` | 向页面发送消息（无需 id） |
+| `.request(type, data?, options?)` | `any` | 向页面发送请求并等待返回 |
+| `.waitMessage(options?)` | `object\|null` | 等待页面消息 |
+| `.drainMessages()` | `array` | 取走全部页面消息队列 |
+| `.onMessage(handler)` | `void` | 注册 Boa 侧消息 handler |
+| `.offMessage()` | `void` | 移除 Boa 侧消息 handler |
+| `.handleNextMessage(options?)` | `object\|null` | 等待一条消息并调用 handler |
+| `.pumpMessages()` | `number` | 批量处理当前队列消息 |
+| `.close()` | `void` | 关闭会话，释放资源（acquire 模式不需要调用） |
 
 ### legado.browser2.run
 
@@ -47,26 +56,17 @@ var session = legado.browser2.acquire(role, options?)  // 按角色复用会话
 legado.browser2.run(url, code, options?) → any
 ```
 
-### 示例：对象风格多步骤会话
+### 示例：acquire 对象风格（推荐）
 
 ```js
 async function chapterContent(chapterUrl) {
-  if (!globalThis._contentSession) {
-    globalThis._contentSession = legado.browser2.create({ visible: false });
-  }
-  var session = globalThis._contentSession;
-
-  try {
-    session.navigate(chapterUrl, { waitUntil: 'load' });
-    return session.eval(`
-      await new Promise(function(resolve) { setTimeout(resolve, 500); });
-      return document.querySelector('#content')?.innerText || '';
-    `);
-  } catch (e) {
-    session.close();
-    globalThis._contentSession = null;
-    throw e;
-  }
+  // acquire 自动复用同一会话，无需手动管理 globalThis
+  var session = legado.browser2.acquire('content', { visible: false });
+  session.navigate(chapterUrl, { waitUntil: 'load' });
+  return session.eval(`
+    await new Promise(function(resolve) { setTimeout(resolve, 500); });
+    return document.querySelector('#content')?.innerText || '';
+  `);
 }
 ```
 

@@ -105,36 +105,60 @@ function ensureLogin() {
 
 ## 网络请求回调
 
-监听探测会话内所有出站请求与响应，回调包含完整的请求头、响应头及响应体，可用于抓取 API 接口数据、捕获加密参数或追踪重定向链。
+监听探测会话内所有出站请求与响应，可用于抓取 API 接口数据、捕获 m3u8 播放地址、提取加密参数等。
+
+::: warning 回调时机：navigate 返回后批量触发
+`handler` **不是**实时触发的。引擎在 `navigate()` 等待页面加载完成后，将本次导航期间所有捕获到的事件批量取出，再逐条同步调用 `handler`。因此 `navigate()` 调用返回即意味着 handler 已执行完毕。
+
+```js
+legado.browser.onRequest(id, handler, options); // 注册
+legado.browser.navigate(id, url, { waitUntil: 'networkidle' }); // 导航完成 + handler 全部执行
+// 此处 handler 已全部执行完毕
+```
+:::
 
 ### legado.browser.onRequest
 
 ```js
-legado.browser.onRequest(id, handler) → void
+legado.browser.onRequest(id, handler, options?) → void
 ```
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `id` | `string` | 会话 ID |
-| `handler` | `function(event)` | 每次请求/响应触发，接收 `RequestEvent` 对象 |
+| `handler` | `function(event)` | 每条事件触发一次，接收 `RequestEvent` 对象 |
+| `options` | `object` | 可选，过滤与捕获选项，见下表 |
+
+#### options 字段
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `captureBody` | `boolean` | `false` | 是否捕获响应体。Windows 上仅对 m3u8 / video / audio 类型生效（见平台说明） |
+| `url` / `urlRegex` / `urlPattern` | `string \| RegExp` | — | 只捕获匹配该正则的 URL；字符串作为正则模式处理 |
+| `contentType` / `contentTypeRegex` / `contentTypePattern` | `string \| RegExp` | — | 按响应 Content-Type 过滤 |
 
 #### RequestEvent 结构
 
 ```ts
 interface RequestEvent {
-  type: 'request' | 'response'  // 请求阶段 或 响应阶段
+  type: 'response'              // Windows/WebView2 只有响应阶段事件
   url: string                   // 请求 URL
   method: string                // HTTP 方法，如 'GET' / 'POST'
-  resourceType: string          // 资源类型，如 'xhr' / 'fetch' / 'document' / 'script'
-  requestHeaders: Record<string, string>  // 原始请求头
-  requestBody?: string          // POST 请求体（文本形式）
-
-  // 以下字段仅 type === 'response' 时存在
-  status?: number               // HTTP 状态码
-  responseHeaders?: Record<string, string>  // 响应头
-  responseBody?: string         // 响应体（文本形式，二进制资源为 null）
+  resourceType: string          // Windows 上固定为 'native'
+  requestHeaders: Record<string, string>  // 请求头（key 已转为小写）
+  status: number                // HTTP 状态码
+  responseHeaders: Record<string, string> // 响应头（key 已转为小写）
+  responseBody: string | null   // 响应体文本；captureBody:false 或非文本类型时为 null
 }
 ```
+
+::: tip responseBody 的限制
+Windows WebView2 上，即使设置 `captureBody: true`，也**仅对以下类型**异步读取响应体：
+- URL 含 `m3u8`
+- Content-Type 含 `mpegurl`、以 `video/` 或 `audio/` 开头
+
+其他类型（JSON、HTML 等）的 `responseBody` 始终为 `null`。读取完成后 `navigate()` 才返回（最长等待 5 秒）。
+:::
 
 ### legado.browser.offRequest
 
@@ -144,59 +168,56 @@ interface RequestEvent {
 legado.browser.offRequest(id) → void
 ```
 
-### 示例：捕获 XHR/Fetch 接口返回
+::: tip 何时调用 offRequest
+使用 `acquire` 模式时，会话会在书源执行结束后自动清理。但如果需要在同一次 `acquire` 会话内切换监听状态，仍可手动调用 `offRequest` 停止捕获。
+:::
+
+### 示例：捕获 m3u8 播放地址
 
 ```js
-async function getApiData(pageUrl) {
-  var id = legado.browser.create({ visible: false, muted: true });
-  var captured = null;
+async function chapterContent(chapterUrl) {
+  var id = legado.browser.acquire('content', { muted: true });
+  var playUrl = '';
 
   legado.browser.onRequest(id, function(event) {
-    if (event.type === 'response'
-        && event.url.includes('/api/chapter')
-        && event.responseBody) {
-      captured = JSON.parse(event.responseBody);
+    if (!playUrl && event.url.toLowerCase().indexOf('m3u8') !== -1
+        && event.status === 200 && event.responseBody
+        && event.responseBody.replace(/^\s+/, '').indexOf('#EXTM3U') === 0) {
+      playUrl = event.url;
     }
-  });
+  }, { captureBody: true });
 
-  legado.browser.navigate(id, pageUrl, { waitUntil: 'networkidle' });
-  legado.browser.offRequest(id);
-  legado.browser.close(id);
+  legado.browser.navigate(id, chapterUrl, { waitUntil: 'networkidle', timeoutSecs: 12 });
+  // navigate 返回时 handler 已执行完毕，playUrl 已赋值
 
-  return captured;
+  if (!playUrl) throw new Error('未能捕获播放地址');
+  return playUrl;
 }
 ```
 
-### 示例：记录完整请求日志
+### 示例：按 URL 模式过滤接口
 
 ```js
-var id = legado.browser.create({ visible: false });
-
 legado.browser.onRequest(id, function(event) {
-  if (event.type === 'request') {
-    legado.log('[REQ] ' + event.method + ' ' + event.url);
-    legado.log('      headers=' + JSON.stringify(event.requestHeaders));
-  } else {
-    legado.log('[RES] ' + event.status + ' ' + event.url);
-    legado.log('      headers=' + JSON.stringify(event.responseHeaders));
+  if (event.responseBody) {
+    var data = JSON.parse(event.responseBody);
+    legado.log('[api] ' + JSON.stringify(data));
   }
-});
+}, { url: /\/api\/chapter\/\d+/, captureBody: false });
 
-legado.browser.navigate(id, 'https://example.com', { waitUntil: 'networkidle' });
+legado.browser.navigate(id, pageUrl, { waitUntil: 'networkidle' });
 legado.browser.offRequest(id);
-legado.browser.close(id);
 ```
 
 ::: info 平台兼容性
 | 平台 | 实现机制 | 响应体 | 请求体 |
 |------|----------|--------|--------|
-| Tauri/Windows (WebView2) | `AddWebResourceRequestedFilter` + `WebResourceResponseReceived` | ✅ | ✅ |
-| Tauri/Android (WebView) | `shouldInterceptRequest` 原生拦截；GET/HEAD 由宿主代理后回填给 WebView | ✅（文本响应；二进制为 null） | 部分（Android WebView 原生 API 不暴露请求体） |
-| Tauri/macOS、Linux (WebKit) | `webkit-web-view` `decide-policy` + `resource-load-finished` | 部分（text 类型）| ✅ |
-| 鸿蒙 (ArkWeb) | `onInterceptRequest` + `WebResourceResponse` | ✅ | ✅ |
-
-二进制资源（图片、视频流等）的 `responseBody` 为 `null`，仅文本类型（JSON、HTML、XML 等）会填充响应体。
+| Tauri/Windows (WebView2) | `WebResourceResponseReceived` COM 事件 | ✅（m3u8/video/audio；异步，最长等 5s） | ❌ |
+| Tauri/Android (WebView) | `shouldInterceptRequest` 原生拦截 | ✅（文本类型；二进制为 null） | ❌（Android WebView API 不暴露请求体） |
+| Tauri/macOS、Linux (WebKit) | 暂不支持 | ❌ | ❌ |
+| 鸿蒙 (ArkWeb) | `onInterceptRequest` | ✅ | ✅ |
 :::
+
 
 ::: warning 注意
 回调在书源 JS 上下文同步触发。不要在 handler 内执行阻塞性 IO 或死循环，避免影响页面加载超时计算。
