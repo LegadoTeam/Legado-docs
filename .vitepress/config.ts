@@ -53,6 +53,7 @@ export default defineConfig({
             { text: '漫画书源', link: '/guide/type-comic' },
             { text: '视频书源', link: '/guide/type-video' },
             { text: '音乐 / 有声书源', link: '/guide/type-music' },
+            { text: '网页书源（webpage）', link: '/guide/type-webpage' },
           ],
         },
         {
