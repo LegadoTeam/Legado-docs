@@ -59,7 +59,7 @@ let resp = browser_request_message_sync(app, session_id, "some-type".into(), jso
 - Windows: 对 WebView2 的同步 eval 有额外处理，异步结果可能无法通过某些同步路径传回；桥接 API 提供替代的 request/response 路径来支持异步。
 
 参考
-- 源码位置：[src-tauri/src/browser_probe_tauri.rs](src-tauri/src/browser_probe_tauri.rs)
-- 页面运行时代码：[src-tauri/src/browser_probe/probe_script.rs](src-tauri/src/browser_probe/probe_script.rs)
+- 源码位置：`src-tauri/src/browser_probe_tauri.rs`
+- 页面运行时代码：`src-tauri/src/browser_probe/probe_script.rs`
 
 如需我把某个超长文件按功能拆成独立模块（并附带编译验证），请指定要拆分的目标文件或允许我自动拆分并运行一次构建检查。

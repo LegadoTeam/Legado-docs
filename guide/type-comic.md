@@ -6,7 +6,8 @@
 
 - 必须标记 `// @type comic`（中文别名：`漫画`）
 - `chapterContent()` 返回 `JSON.stringify(imageUrls)`（图片 URL 数组）
-- 可选实现 `processImage()` 回调处理图片（解密、拼接等）
+- 可选实现 `prepareImage()` 钩子：每张图片下载**前**调用，可覆盖 URL 和/或注入请求头（Referer、Origin 等）
+- 可选实现 `processImage()` 回调：每张图片下载**后**调用，用于解密、拼接还原等
 - 第 1 话如果 `href="javascript:;"`，需映射为 `tocUrl`
 
 ## 完整示例
@@ -140,4 +141,41 @@ function processImage(base64Data, pageIndex, imageUrl) {
 - 漫画图片缓存模式开启时（`comic_cache_enabled = true`），Rust 下载每张图片后自动检测并调用
 - 书源未定义 `processImage` → 保持原有轻量异步下载路径
 - 返回 `null` → 保持原始图片不处理
+:::
+
+## prepareImage 钩子（请求头控制）
+
+图片由 Rust 后台下载，`chapterContent` 中设置的 headers 对图片请求**无效**。若需要控制图片下载的 `Referer`、`Origin` 或覆盖 URL，定义 `prepareImage` 函数：
+
+```js
+// 注入防盗链所需的 Referer / Origin
+function prepareImage(url, pageIndex) {
+  return {
+    headers: {
+      'Referer': BASE + '/',
+      'Origin': BASE
+    }
+  };
+}
+```
+
+| 返回字段 | 说明 |
+|----------|------|
+| `url` | 覆盖实际下载地址（省略则使用原始 URL） |
+| `headers` | 追加/覆盖请求头（同名键覆盖，新键追加） |
+
+**默认 Referer 行为**：未定义 `prepareImage` 时，Referer 填充为章节 URL。若章节 URL 是非 HTTP 格式（如管道分隔键），服务器会收到无效 Referer，可能触发防盗链。
+
+## 两个钩子的执行顺序
+
+```
+prepareImage(url, i)          → 确定下载 URL 和请求头（Phase 1，串行）
+  ↓ Rust 并发下载图片
+processImage(base64, i, url)  → 解密/拼接处理（Phase 3，串行）
+```
+
+只定义其中一个完全合法。同时定义时共用同一 Boa 引擎实例，但两者执行阶段不同。
+
+::: tip 详细文档
+完整 API 参考与更多示例见 [advanced/process-image](../advanced/process-image.md)
 :::

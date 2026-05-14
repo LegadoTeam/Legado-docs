@@ -343,7 +343,29 @@ var html = legado.browser.html(id);
 >
 > 📖 详见：[api/browser-session](../api/browser-session.md) · [api/browser-navigate](../api/browser-navigate.md) · [api/browser-page](../api/browser-page.md) · [advanced/browser-probe](../advanced/browser-probe.md)
 
-### 4.2 图片处理（漫画加密图）
+### 4.2 图片下载钩子（漫画）
+
+漫画图片由 Rust 后台下载，`chapterContent` 里设置的 headers 对图片请求**无效**。控制图片下载行为需使用以下两个钩子：
+
+#### prepareImage — 下载前（URL 重写 / 请求头注入）
+
+**触发条件**：防盗链（Referer/Origin）、动态签名 URL、需要替换图片地址。
+
+```js
+function prepareImage(url, pageIndex) {
+  return {
+    // url: '...',        // 可选：覆盖下载地址
+    headers: {
+      'Referer': BASE + '/',
+      'Origin': BASE
+    }
+  };
+}
+```
+
+> ⚠️ 未定义 `prepareImage` 时，Referer 默认填充为章节 URL。若章节 URL 是非 HTTP 格式（如管道分隔键），服务器会收到无效 Referer，可能触发防盗链拦截。
+
+#### processImage — 下载后（图片解密 / 拼接还原）
 
 **触发条件**：漫画图片被分条打乱加密，需要还原。
 
@@ -356,6 +378,8 @@ function processImage(base64Data, pageIndex, imageUrl) {
   return result;  // 返回 null 表示不处理
 }
 ```
+
+**执行顺序**：`prepareImage`（Phase 1 串行）→ Rust 并发下载 → `processImage`（Phase 3 串行）。两者可独立或同时使用。
 
 > 📖 详见：[api/image](../api/image.md) · [advanced/process-image](../advanced/process-image.md)
 

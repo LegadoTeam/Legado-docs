@@ -68,6 +68,7 @@ export default defineConfig({
           items: [
             { text: '社区书源仓库规范', link: '/guide/community-booksource-repository' },
             { text: '在线书源仓库', link: '/guide/online-booksources' },
+            { text: '深链接（Deep Link）', link: '/guide/deep-link' },
           ],
         },
         {
