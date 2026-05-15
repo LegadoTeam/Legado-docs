@@ -73,9 +73,7 @@ export default defineConfig({
         },
         {
           text: '更新日志',
-          items: [
-            { text: 'API 更新日志', link: '/guide/changelog' },
-          ],
+          items: [{ text: 'API 更新日志', link: '/guide/changelog' }],
         },
       ],
 
@@ -165,15 +163,11 @@ export default defineConfig({
         },
         {
           text: '平台兼容',
-          items: [
-            { text: '鸿蒙兼容性与异步语义', link: '/advanced/harmony-async' },
-          ],
+          items: [{ text: '鸿蒙兼容性与异步语义', link: '/advanced/harmony-async' }],
         },
         {
           text: '规范',
-          items: [
-            { text: '最佳实践', link: '/advanced/best-practices' },
-          ],
+          items: [{ text: '最佳实践', link: '/advanced/best-practices' }],
         },
       ],
 
