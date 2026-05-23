@@ -4,27 +4,28 @@
 
 ## 适合使用的工具形态
 
-| 工具形态 | 典型工具 | 适合做什么 |
-|---------|----------|------------|
-| AI IDE / 编辑器 Agent | Cursor、Windsurf | 让 AI 直接读写书源文件、根据测试结果修改代码 |
-| VS Code 助手 | GitHub Copilot Chat / Agent | 在现有 VS Code 工作区中辅助补函数、解释报错、重构选择器 |
-| 终端 Agent | Claude Code 等 | 适合会使用命令行的用户，能按步骤运行测试并修改文件 |
-| 普通聊天 AI | ChatGPT、Claude、Gemini 等 | 适合先分析页面结构、生成单个函数，再手动粘贴到书源文件 |
+| 工具形态              | 典型工具                    | 适合做什么                                              |
+| --------------------- | --------------------------- | ------------------------------------------------------- |
+| AI IDE / 编辑器 Agent | Cursor、Windsurf            | 让 AI 直接读写书源文件、根据测试结果修改代码            |
+| VS Code 助手          | GitHub Copilot Chat / Agent | 在现有 VS Code 工作区中辅助补函数、解释报错、重构选择器 |
+| 终端 Agent            | Claude Code 等              | 适合会使用命令行的用户，能按步骤运行测试并修改文件      |
+| 普通聊天 AI           | ChatGPT、Claude、Gemini 等  | 适合先分析页面结构、生成单个函数，再手动粘贴到书源文件  |
 
 无论使用哪一种工具，都要把 AI 当成“会写代码但不了解目标站点”的助手：你负责给它目标 URL、页面 HTML、报错日志和测试结果，它负责写代码和修复。
 
 ## 准备工作
 
-1. 新建一个空目录，例如 `my-booksources/`，专门放正在制作的 `.js` 书源。
-2. 打开 Legado Tauri，确认可以使用“书源管理”和“调试/测试”功能。
-3. 准备目标站点的几个页面：
+1. 准备一个工作目录，把 Legado Tauri 软件本体项目或运行程序放进去。
+2. 下载 [Legado-docs 仓库](https://github.com/LegadoTeam/Legado-docs)，放在同一个工作目录下；这个仓库包含全部提示词和配套文档。
+3. 在 AI 编程工具里同时打开软件本体和 Legado-docs，让 AI 引用仓库中的 `public-docs/prompt/booksource.md` 作为起始提示词。
+4. 打开 Legado Tauri，确认可以使用“书源管理”和“调试/测试”功能。
+5. 准备目标站点的几个页面：
    - 首页或分类页
    - 搜索结果页
    - 书籍详情页
    - 章节目录页
    - 章节正文页
-4. 打开 [书源制作提示词](/prompt/booksource)，复制给 AI 作为项目规则或系统提示词。
-5. 让 AI 优先阅读这些文档：
+6. 让 AI 优先阅读这些文档：
    - [BookItem 数据结构](/api/types-book-item)
    - [搜索 search](/guide/search)
    - [书籍详情 bookInfo](/guide/book-info)
@@ -111,8 +112,8 @@ name、author、bookUrl、coverUrl、kind、latestChapter、latestChapterUrl、w
 
 ### Cursor / Windsurf
 
-1. 打开书源目录。
-2. 新建规则文件，把 [书源制作提示词](/prompt/booksource) 放进去。
+1. 打开同时包含 Legado Tauri 软件本体和 Legado-docs 的工作目录。
+2. 让 Agent 先读取 `public-docs/prompt/booksource.md`，再开始编写书源。
 3. 把目标书源文件、测试日志和相关文档作为上下文交给 Agent。
 4. 要求 Agent 每次只改当前书源文件，不要改应用源码。
 
@@ -127,10 +128,13 @@ name、author、bookUrl、coverUrl、kind、latestChapter、latestChapterUrl、w
 
 ### GitHub Copilot / VS Code
 
-1. 把提示词放到 `.github/copilot-instructions.md`。
-2. 打开书源 `.js` 文件。
-3. 用 Chat 让 Copilot 只补一个函数，或者选中函数后让它修复。
-4. 把调试面板或 CLI 报错粘贴回 Chat。
+1. 在 VS Code 工作区中同时打开 Legado Tauri 软件本体和 Legado-docs。
+2. 让 Copilot 读取 `public-docs/prompt/booksource.md`，并按其中流程开始编写。
+3. 打开书源 `.js` 文件。
+4. 用 Chat 让 Copilot 只补一个函数，或者选中函数后让它修复。
+5. 把调试面板或 CLI 报错粘贴回 Chat。
+
+如果工具无法直接读取 Legado-docs 文件，再把 [书源制作提示词](/prompt/booksource) 的完整内容复制到项目规则或系统提示词中作为兜底。
 
 建议把问题写得具体：
 
