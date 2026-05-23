@@ -22,28 +22,21 @@
 
 AI 在每个阶段只需要查阅对应的文档页面，而非一次性加载全部内容。
 
-## 使用方式
+## 推荐流程
 
-### 方式一：直接复制
+正确的使用方式是先准备完整环境，再从主提示词开始，而不是零散复制某一小段内容。
 
-将 [书源制作提示词](/prompt/booksource) 页面内容复制为 AI 对话的系统提示词。
+1. 先把 Legado Tauri 软件本体项目放在一个工作目录内。
+2. 再下载 [Legado-docs 仓库](https://github.com/LegadoTeam/Legado-docs)。这个仓库包含书源制作需要的全部提示词与配套说明。
+3. 编写书源时，以 [书源制作提示词](/prompt/booksource) 对应的 `booksource.md` 作为起始提示词，让 AI 先按标准骨架开始编写。
+4. 进入实际实现与调试阶段后，再配合 [如何使用 AI 编程工具编写书源](/prompt/ai-workflow) 页面，按“探测 → 单函数实现 → 测试 → 修复”的方式推进。
 
-### 方式二：作为项目指令
-
-在 VS Code / Cursor 等编辑器中，将提示词文件放入项目的 `.github/copilot-instructions.md` 或 `.cursorrules`。
-
-### 方式三：结合文档站
-
-提示词中的文档链接指向本站页面。AI 如果支持联网，可以直接访问链接获取完整 API 细节。不支持联网时，提示词本身包含了足够的摘要信息。
-
-### 方式四：配合 AI 编程工具
-
-如果你使用 Cursor、GitHub Copilot、Windsurf、Claude Code 等工具，先阅读 [如何使用 AI 编程工具编写书源](/prompt/ai-workflow)，按“探测 → 单函数实现 → 测试 → 修复”的方式推进。
+如果你使用 VS Code、Cursor、GitHub Copilot、Windsurf、Claude Code 等工具，建议让 AI 能同时访问软件本体项目和提示词仓库，这样它可以一边读取提示词，一边直接产出和修改书源文件。
 
 ## 可用提示词
 
-| 提示词 | 适用场景 |
-|--------|---------|
-| [如何使用 AI 编程工具编写书源](/prompt/ai-workflow) | 教用户用 Cursor / Copilot / Windsurf / Claude Code 等工具实际制作和调试书源 |
-| [书源制作提示词](/prompt/booksource) | 指导 AI 从零制作 Legado Tauri 书源（小说/漫画/视频） |
-| [书源交付智能体提示词](/prompt/booksource-delivery-agent) | 让 AI 直接交付完整书源 JS 与完整 tester.html 测试页面 |
+| 提示词                                                    | 适用场景                                                                    |
+| --------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [如何使用 AI 编程工具编写书源](/prompt/ai-workflow)       | 教用户用 Cursor / Copilot / Windsurf / Claude Code 等工具实际制作和调试书源 |
+| [书源制作提示词](/prompt/booksource)                      | 指导 AI 从零制作 Legado Tauri 书源（小说/漫画/视频）                        |
+| [书源交付智能体提示词](/prompt/booksource-delivery-agent) | 让 AI 直接交付完整书源 JS 与完整 tester.html 测试页面                       |

@@ -13,8 +13,14 @@ hero:
       text: API 参考
       link: /api/
     - theme: alt
-      text: GitHub
+      text: GitHub 主仓库
       link: https://github.com/LegadoTeam/Legado-Tauri
+    - theme: alt
+      text: GitHub docs 仓库
+      link: https://github.com/LegadoTeam/Legado-docs
+    - theme: alt
+      text: GitHub Tauri Release 仓库（下载地址）
+      link: https://github.com/LegadoTeam/Legado-Tauri-Release
     - theme: alt
       text: QQ 交流群：645815655(已满)  949235656
       # link: https://qm.qq.com/q/xxxxxx
