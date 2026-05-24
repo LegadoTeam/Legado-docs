@@ -4,6 +4,23 @@
 
 ---
 
+## VIP 章节
+
+### `ChapterInfo` 新增 VIP 字段
+
+- `chapterList()` 返回项可携带 `vip: true` 标记付费章节。
+- 可选字段 `price`、`currency` 用于展示价格，并会作为 `chapter` 参数传给购买函数。
+
+### 新增可选函数 `purchaseChapter`
+
+```js
+async function purchaseChapter(chapterUrl, chapter) → boolean | PurchaseChapterResult
+```
+
+应用在 VIP 章节读取失败且用户确认购买后调用该函数。购买成功后会重新调用 `chapterContent()`。
+
+参见：[VIP 章节购买](/guide/purchase-chapter) 和 [PurchaseChapterResult](/api/types-purchase-result)。
+
 ## 浏览器探测
 
 ### `legado.browser.acquire` 成为推荐入口
@@ -32,11 +49,11 @@ legado.browser2.fromId(id) → BrowserSession
 
 `onRequest(id, handler, options?)` 的 `options` 新增以下字段：
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `captureBody` | `boolean` | 是否捕获响应体。Windows 上仅对 m3u8/video/audio 类型生效 |
-| `url` / `urlRegex` / `urlPattern` | `string \| RegExp` | 只捕获匹配该正则的 URL |
-| `contentType` / `contentTypeRegex` | `string \| RegExp` | 按 Content-Type 过滤 |
+| 字段                               | 类型               | 说明                                                     |
+| ---------------------------------- | ------------------ | -------------------------------------------------------- |
+| `captureBody`                      | `boolean`          | 是否捕获响应体。Windows 上仅对 m3u8/video/audio 类型生效 |
+| `url` / `urlRegex` / `urlPattern`  | `string \| RegExp` | 只捕获匹配该正则的 URL                                   |
+| `contentType` / `contentTypeRegex` | `string \| RegExp` | 按 Content-Type 过滤                                     |
 
 **重要行为**：handler 不是实时触发，而是 `navigate()` 返回后批量执行。`navigate()` 调用返回时所有事件已处理完毕。
 
@@ -60,11 +77,11 @@ legado.browser.getCookie(domain, name) → string | undefined
 
 `legado.browser2` 命名空间提供与 `legado.browser` 句柄风格等价的对象风格封装，所有新 API 在两种风格中同步可用。
 
-| `legado.browser2` 工厂方法 | 说明 |
-|------|------|
-| `acquire(role, options?)` | **推荐**：按角色获取/复用，返回 `BrowserSession` |
-| `create(options?)` | 新建独立会话，返回 `BrowserSession` |
-| `run(url, code, options?)` | 一次性导航 + eval |
-| `fromId(id)` | 从底层 ID 包装 `BrowserSession` |
+| `legado.browser2` 工厂方法 | 说明                                             |
+| -------------------------- | ------------------------------------------------ |
+| `acquire(role, options?)`  | **推荐**：按角色获取/复用，返回 `BrowserSession` |
+| `create(options?)`         | 新建独立会话，返回 `BrowserSession`              |
+| `run(url, code, options?)` | 一次性导航 + eval                                |
+| `fromId(id)`               | 从底层 ID 包装 `BrowserSession`                  |
 
 参见：[导航与执行](/api/browser-navigate)

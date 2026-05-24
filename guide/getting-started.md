@@ -22,25 +22,27 @@
 // @enabled     true
 // @description 示例书源
 
-var BASE = 'https://www.example.com';
+var BASE = "https://www.example.com";
 
 // ── 搜索 ─────────────────────────────────────────
 async function search(keyword, page) {
-  var html = await legado.http.get(BASE + '/search?q=' + encodeURIComponent(keyword) + '&page=' + page);
+  var html = await legado.http.get(
+    BASE + "/search?q=" + encodeURIComponent(keyword) + "&page=" + page,
+  );
   var doc = legado.dom.parse(html);
-  var items = legado.dom.selectAll(doc, '.book-item');
+  var items = legado.dom.selectAll(doc, ".book-item");
   var books = [];
   for (var i = 0; i < items.length; i++) {
     books.push({
-      name: legado.dom.selectText(items[i], '.title'),
-      author: legado.dom.selectText(items[i], '.author'),
-      bookUrl: legado.dom.selectAttr(items[i], 'a', 'href'),
-      coverUrl: legado.dom.selectAttr(items[i], 'img', 'src'),
-      latestChapter: legado.dom.selectText(items[i], '.latest a'),
-      latestChapterUrl: legado.dom.selectAttr(items[i], '.latest a', 'href'),
-      wordCount: legado.dom.selectText(items[i], '.words'),
-      updateTime: legado.dom.selectText(items[i], '.updated'),
-      status: legado.dom.selectText(items[i], '.status')
+      name: legado.dom.selectText(items[i], ".title"),
+      author: legado.dom.selectText(items[i], ".author"),
+      bookUrl: legado.dom.selectAttr(items[i], "a", "href"),
+      coverUrl: legado.dom.selectAttr(items[i], "img", "src"),
+      latestChapter: legado.dom.selectText(items[i], ".latest a"),
+      latestChapterUrl: legado.dom.selectAttr(items[i], ".latest a", "href"),
+      wordCount: legado.dom.selectText(items[i], ".words"),
+      updateTime: legado.dom.selectText(items[i], ".updated"),
+      status: legado.dom.selectText(items[i], ".status"),
     });
   }
   legado.dom.free(doc);
@@ -52,17 +54,19 @@ async function bookInfo(bookUrl) {
   var html = await legado.http.get(bookUrl);
   var doc = legado.dom.parse(html);
   var info = {
-    name: legado.dom.selectText(doc, 'h1'),
-    author: legado.dom.selectText(doc, '.author'),
-    coverUrl: legado.dom.selectAttr(doc, '.cover img', 'src'),
-    intro: legado.dom.selectText(doc, '.intro'),
-    latestChapter: legado.dom.selectText(doc, '.latest a'),
-    latestChapterUrl: legado.dom.selectAttr(doc, '.latest a', 'href'),
-    wordCount: legado.dom.selectText(doc, '.words'),
-    chapterCount: Number(legado.dom.selectText(doc, '.chapter-count').replace(/\D/g, '')) || 0,
-    updateTime: legado.dom.selectText(doc, '.updated'),
-    status: legado.dom.selectText(doc, '.status'),
-    tocUrl: bookUrl
+    name: legado.dom.selectText(doc, "h1"),
+    author: legado.dom.selectText(doc, ".author"),
+    coverUrl: legado.dom.selectAttr(doc, ".cover img", "src"),
+    intro: legado.dom.selectText(doc, ".intro"),
+    latestChapter: legado.dom.selectText(doc, ".latest a"),
+    latestChapterUrl: legado.dom.selectAttr(doc, ".latest a", "href"),
+    wordCount: legado.dom.selectText(doc, ".words"),
+    chapterCount:
+      Number(legado.dom.selectText(doc, ".chapter-count").replace(/\D/g, "")) ||
+      0,
+    updateTime: legado.dom.selectText(doc, ".updated"),
+    status: legado.dom.selectText(doc, ".status"),
+    tocUrl: bookUrl,
   };
   legado.dom.free(doc);
   return info;
@@ -72,11 +76,11 @@ async function bookInfo(bookUrl) {
 async function chapterList(tocUrl) {
   var html = await legado.http.get(tocUrl);
   var doc = legado.dom.parse(html);
-  var names = legado.dom.selectAllTexts(doc, '.chapter-list a');
-  var urls = legado.dom.selectAllAttrs(doc, '.chapter-list a', 'href');
+  var names = legado.dom.selectAllTexts(doc, ".chapter-list a");
+  var urls = legado.dom.selectAllAttrs(doc, ".chapter-list a", "href");
   var chapters = [];
   for (var i = 0; i < names.length; i++) {
-    chapters.push({ name: names[i], url: urls[i] });
+    chapters.push({ name: names[i], url: urls[i], vip: false });
   }
   legado.dom.free(doc);
   return chapters;
@@ -86,7 +90,7 @@ async function chapterList(tocUrl) {
 async function chapterContent(chapterUrl) {
   var html = await legado.http.get(chapterUrl);
   var doc = legado.dom.parse(html);
-  var text = legado.dom.selectText(doc, '#content');
+  var text = legado.dom.selectText(doc, "#content");
   legado.dom.free(doc);
   return text;
 }
@@ -106,6 +110,8 @@ legado_tauri cli booksource-test ./我的书源.js all 斗破苍穹
 
 或在应用内打开「书源管理 → 调试」面板进行可视化调试。
 
+VIP 站点可在章节对象中返回 `vip`、`price`、`currency`，并额外实现 `purchaseChapter(chapterUrl, chapter)`。应用只会在用户确认购买 VIP 章节后调用购买函数，成功后再重试正文读取。
+
 ## 两种网站类型
 
 ### HTML 站点
@@ -115,7 +121,7 @@ legado_tauri cli booksource-test ./我的书源.js all 斗破苍穹
 ```js
 var html = await legado.http.get(url);
 var doc = legado.dom.parse(html);
-var title = legado.dom.selectText(doc, 'h1.title');
+var title = legado.dom.selectText(doc, "h1.title");
 legado.dom.free(doc);
 ```
 
@@ -124,9 +130,9 @@ legado.dom.free(doc);
 部分站点提供 JSON API，直接 `JSON.parse()` 即可：
 
 ```js
-var resp = await legado.http.get('https://api.example.com/books?q=' + keyword);
+var resp = await legado.http.get("https://api.example.com/books?q=" + keyword);
 var data = JSON.parse(resp);
-return data.list.map(function(item) {
+return data.list.map(function (item) {
   return {
     name: item.title,
     bookUrl: item.url,
@@ -135,7 +141,7 @@ return data.list.map(function(item) {
     wordCount: item.wordCountText,
     chapterCount: item.chapterCount,
     updateTime: item.updateTime,
-    status: item.status
+    status: item.status,
   };
 });
 ```

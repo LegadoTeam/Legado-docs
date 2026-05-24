@@ -91,3 +91,11 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 | [`legado.config.read(scope, key)`](/api/config)         | 读取配置     |
 | [`legado.config.write(scope, key, value)`](/api/config) | 写入配置     |
 | [`legado.ui.emit(event, data)`](/api/ui-emit)           | 推送 UI 事件 |
+
+### 数据结构 {#types}
+
+| 类型                                                  | 说明                                            |
+| ----------------------------------------------------- | ----------------------------------------------- |
+| [`BookItem`](/api/types-book-item)                    | 搜索、发现和书籍详情返回结构                    |
+| [`ChapterInfo`](/api/types-chapter)                   | `chapterList()` 返回的章节结构，支持 `vip` 标记 |
+| [`PurchaseChapterResult`](/api/types-purchase-result) | `purchaseChapter()` 推荐返回结构                |

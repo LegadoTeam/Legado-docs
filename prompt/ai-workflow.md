@@ -70,8 +70,9 @@ name、author、bookUrl、coverUrl、kind、latestChapter、latestChapterUrl、w
 1. `search(keyword, page)`
 2. `bookInfo(bookUrl)`
 3. `chapterList(tocUrl)`
-4. `chapterContent(chapterUrl)`
-5. `explore(page, category)`
+4. `purchaseChapter(chapterUrl, chapter)`（仅 VIP 付费章节需要）
+5. `chapterContent(chapterUrl)`
+6. `explore(page, category)`
 
 每个函数写完后立即测试。不要等五个函数都写完再测。
 

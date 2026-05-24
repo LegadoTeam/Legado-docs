@@ -153,11 +153,12 @@ explore → bookInfo → chapterList → chapterContent → search
 // @tags        标签1,标签2
 // @description 简短描述
 
-var BASE = 'https://example.com';
+var BASE = "https://example.com";
 
 async function search(keyword, page) {}
 async function bookInfo(bookUrl) {}
 async function chapterList(tocUrl) {}
+async function purchaseChapter(chapterUrl, chapter) {} // 可选：VIP 章节购买
 async function chapterContent(chapterUrl) {}
 async function explore(page, category) {}
 ```
@@ -167,6 +168,7 @@ async function explore(page, category) {}
 - `search()` 返回 `BookItem[]`
 - `bookInfo()` 返回单个 `BookItem`，且必须带 `tocUrl`
 - `chapterList()` 必须正序返回
+- VIP / 付费章节在 `chapterList()` 中返回 `vip: true`；需要购买时实现 `purchaseChapter()`
 - `chapterContent()` 的返回值类型必须符合书源类型
 - `explore()` 实现时，`GETALL` 返回分类数组，分类页返回 `BookItem[]`
 
@@ -213,6 +215,7 @@ async function explore(page, category) {}
 - 打开后展示 `bookInfo`
 - 支持切换“详情 / 章节列表 / 正文”
 - 章节列表调用 `POST /api/booksource/chapter-list`
+- VIP 购买调用 `POST /api/booksource/purchase-chapter`
 - 正文调用 `POST /api/booksource/chapter-content`
 
 ### 6. 自动测试页
@@ -301,6 +304,24 @@ POST /api/booksource/book-info
 
 ```http
 POST /api/booksource/chapter-list
+```
+
+### VIP 购买
+
+```http
+POST /api/booksource/purchase-chapter
+```
+
+```json
+{
+  "fileName": "xxx.js",
+  "chapterUrl": "https://example.com/chapter/2",
+  "chapter": {
+    "name": "第2章",
+    "url": "https://example.com/chapter/2",
+    "vip": true
+  }
+}
 ```
 
 ### 正文

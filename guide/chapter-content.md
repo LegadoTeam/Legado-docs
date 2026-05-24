@@ -22,6 +22,8 @@ async function chapterContent(chapterUrl) → Promise<string>
 
 小说书源如果需要在段落尾部展示评论数量，可以额外实现 [段评接口](./paragraph-comments.md)。段评数量会在正文显示前完成加载，并参与分页排版。
 
+如果章节目录中某章标记了 `vip: true`，`chapterContent()` 仍然保持同样签名。未购买时建议抛出清晰错误，应用会在用户确认后调用可选的 [`purchaseChapter()`](./purchase-chapter.md)，购买成功后再重试 `chapterContent()`。
+
 ## 小说正文
 
 ```js

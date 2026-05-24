@@ -8,12 +8,15 @@
 
 段落序号从 `0` 开始，基准是 `chapterContent()` 返回正文按空行/换行切分后的最终段落数组。宿主会把同一份数组传给 `chapterParagraphCommentCounts()` 的 `context.paragraphs`。
 
-范围 key 使用 `${start}+${end}`：
+范围 key 支持两种写法：`${index}` 和 `${start}+${end}`。
 
 | key   | 含义                         |
 | ----- | ---------------------------- |
+| `3`   | 第 4 个段落自己的段评        |
 | `3+3` | 第 4 个段落自己的段评        |
 | `3+5` | 覆盖第 4 到第 6 个段落的段评 |
+
+其中 `3` 等价于 `3+3`。
 
 阅读器会把同一结束段落的多个范围合并显示，例如 `3+3` 与 `2+3` 都会显示在第 4 个段落尾部，数量相加。
 
@@ -26,7 +29,7 @@ async function chapterParagraphCommentCounts(chapterUrl, context) {
 
   // 推荐返回对象：key 为范围，值为数量
   return {
-    "0+0": json.firstParagraphCount,
+    0: json.firstParagraphCount,
     "3+3": 12,
     "6+8": 5,
   };
@@ -51,10 +54,18 @@ async function chapterParagraphCommentCounts(chapterUrl, context) {
 
 ```js
 return [
-  { key: "0+0", count: 3 },
-  { start: 3, end: 3, count: 12 },
+  { key: "0", count: 3 },
+  { start: 3, count: 12 },
   { start: 6, end: 8, count: 5 },
 ];
+```
+
+数组项里如果只写一个下标，默认就是单段落：
+
+```js
+{ key: "1", count: 9 } // 等价于 1+1
+{ start: 3, count: 12 } // 等价于 3+3
+{ end: 5, count: 4 }    // 等价于 5+5
 ```
 
 只返回数量，不要在这个接口返回完整评论详情。阅读器会在正文显示前等待支持该接口的书源返回数量。
@@ -164,7 +175,7 @@ async function chapterParagraphCommentCounts(chapterUrl, context) {
   for (var i = 0; i < context.paragraphCount; i++) {
     var count = data[String(i)] || 0;
     if (count > 0) {
-      result[i + "+" + i] = count;
+      result[String(i)] = count;
     }
   }
 

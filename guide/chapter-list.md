@@ -8,39 +8,56 @@
 async function chapterList(tocUrl) → Promise<ChapterInfo[]>
 ```
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
+| 参数     | 类型     | 说明                                            |
+| -------- | -------- | ----------------------------------------------- |
 | `tocUrl` | `string` | 目录页 URL（来自 `bookInfo()` 返回的 `tocUrl`） |
 
 返回 `ChapterInfo[]` 数组，**必须正序排列**（第一章在前）：
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `name` | `string` | ✅ | 章节名 |
-| `url` | `string` | ✅ | 章节 URL |
-| `group` | `string` | 否 | 分组名（视频多线路时使用） |
+| 字段       | 类型               | 必填 | 说明                                         |
+| ---------- | ------------------ | ---- | -------------------------------------------- |
+| `name`     | `string`           | ✅   | 章节名                                       |
+| `url`      | `string`           | ✅   | 章节 URL                                     |
+| `group`    | `string`           | 否   | 分组名（视频多线路时使用）                   |
+| `vip`      | `boolean`          | 否   | 是否为 VIP / 付费章节，默认 `false`          |
+| `price`    | `string \| number` | 否   | 章节价格或消耗点数，仅用于展示和传给购买函数 |
+| `currency` | `string`           | 否   | 价格单位，如 `点`、`书币`、`币`              |
 
 ## 基本示例
 
 ```js
 async function chapterList(tocUrl) {
-  legado.log('[chapterList] url=' + tocUrl);
+  legado.log("[chapterList] url=" + tocUrl);
 
   var html = await legado.http.get(tocUrl);
   var doc = legado.dom.parse(html);
 
-  var names = legado.dom.selectAllTexts(doc, '#list dd a');
-  var urls = legado.dom.selectAllAttrs(doc, '#list dd a', 'href');
+  var names = legado.dom.selectAllTexts(doc, "#list dd a");
+  var urls = legado.dom.selectAllAttrs(doc, "#list dd a", "href");
 
   var chapters = [];
   for (var i = 0; i < names.length; i++) {
     chapters.push({ name: names[i], url: urls[i] });
   }
 
-  legado.log('[chapterList] count=' + chapters.length);
+  legado.log("[chapterList] count=" + chapters.length);
   legado.dom.free(doc);
   return chapters;
 }
+```
+
+## VIP 章节
+
+如果目录能识别付费章节，返回 `vip: true`。应用会在读取该章节失败时提示用户，并在用户确认后调用可选的 [`purchaseChapter()`](./purchase-chapter.md)。
+
+```js
+chapters.push({
+  name: "第120章 风暴之前",
+  url: "https://example.com/chapter/120",
+  vip: true,
+  price: 12,
+  currency: "书币",
+});
 ```
 
 ## 多页目录
@@ -55,7 +72,11 @@ async function chapterList(tocUrl) {
   var doc = legado.dom.parse(html);
 
   // 提取分页 URL
-  var pageUrls = legado.dom.selectAllAttrs(doc, 'select.chapter-page option', 'value');
+  var pageUrls = legado.dom.selectAllAttrs(
+    doc,
+    "select.chapter-page option",
+    "value",
+  );
   legado.dom.free(doc);
 
   if (pageUrls.length <= 1) {
@@ -91,15 +112,15 @@ async function chapterList(tocUrl) {
     var doc = legado.dom.parse(html);
 
     // 解析当前页章节
-    var names = legado.dom.selectAllTexts(doc, '.chapter-list a');
-    var urls = legado.dom.selectAllAttrs(doc, '.chapter-list a', 'href');
+    var names = legado.dom.selectAllTexts(doc, ".chapter-list a");
+    var urls = legado.dom.selectAllAttrs(doc, ".chapter-list a", "href");
     for (var i = 0; i < names.length; i++) {
       chapters.push({ name: names[i], url: urls[i] });
     }
 
     // 查找下一页
-    var nextLink = legado.dom.selectByText(doc, '下一页');
-    var nextUrl = nextLink ? legado.dom.attr(nextLink, 'href') : null;
+    var nextLink = legado.dom.selectByText(doc, "下一页");
+    var nextUrl = nextLink ? legado.dom.attr(nextLink, "href") : null;
     legado.dom.free(doc);
 
     if (!nextUrl || nextUrl === currentUrl) break;

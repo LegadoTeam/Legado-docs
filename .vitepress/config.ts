@@ -53,6 +53,10 @@ export default defineConfig({
             { text: "bookInfo — 书籍详情", link: "/guide/book-info" },
             { text: "chapterList — 章节目录", link: "/guide/chapter-list" },
             {
+              text: "purchaseChapter — VIP 购买",
+              link: "/guide/purchase-chapter",
+            },
+            {
               text: "chapterContent — 章节正文",
               link: "/guide/chapter-content",
             },
@@ -160,6 +164,10 @@ export default defineConfig({
           items: [
             { text: "BookItem", link: "/api/types-book-item" },
             { text: "ChapterInfo", link: "/api/types-chapter" },
+            {
+              text: "PurchaseChapterResult",
+              link: "/api/types-purchase-result",
+            },
             { text: "书源元数据字段", link: "/api/types-meta" },
           ],
         },

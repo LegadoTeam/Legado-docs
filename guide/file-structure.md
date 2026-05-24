@@ -27,21 +27,21 @@
 
 ### 字段说明
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `@name` | `string` | ✅ | 书源名称，在列表中显示 |
-| `@version` | `string` | 推荐 | 版本号，用于更新检测 |
-| `@author` | `string` | 推荐 | 书源作者 |
-| `@url` | `string` | ✅ | 主站 URL，可多行（第一个为主 URL） |
-| `@updateUrl` | `string` | 否 | 自动更新地址，指向远程 `.js` 文件 |
-| `@require` | `string` | 否 | 依赖 JS 的 URL，可多行，书源加载前依序 eval |
-| `@group` | `string` | 否 | 分组归类 |
-| `@logo` | `string` | 否 | 图标 URL，在书源卡片中显示 |
-| `@type` | `string` | 否 | 书源类型：`comic`（漫画）/ `video`（视频），默认为小说 |
-| `@enabled` | `boolean` | 否 | 是否启用，默认 `true` |
-| `@minDelay` | `number` | 否 | 最小请求间隔（毫秒），防止频率过高被封 |
-| `@tags` | `string` | 否 | 标签列表（逗号分隔），第一个值作为 UI 分组 |
-| `@description` | `string` | 否 | 简介，多行自动拼接 |
+| 字段           | 类型      | 必填 | 说明                                                   |
+| -------------- | --------- | ---- | ------------------------------------------------------ |
+| `@name`        | `string`  | ✅   | 书源名称，在列表中显示                                 |
+| `@version`     | `string`  | 推荐 | 版本号，用于更新检测                                   |
+| `@author`      | `string`  | 推荐 | 书源作者                                               |
+| `@url`         | `string`  | ✅   | 主站 URL，可多行（第一个为主 URL）                     |
+| `@updateUrl`   | `string`  | 否   | 自动更新地址，指向远程 `.js` 文件                      |
+| `@require`     | `string`  | 否   | 依赖 JS 的 URL，可多行，书源加载前依序 eval            |
+| `@group`       | `string`  | 否   | 分组归类                                               |
+| `@logo`        | `string`  | 否   | 图标 URL，在书源卡片中显示                             |
+| `@type`        | `string`  | 否   | 书源类型：`comic`（漫画）/ `video`（视频），默认为小说 |
+| `@enabled`     | `boolean` | 否   | 是否启用，默认 `true`                                  |
+| `@minDelay`    | `number`  | 否   | 最小请求间隔（毫秒），防止频率过高被封                 |
+| `@tags`        | `string`  | 否   | 标签列表（逗号分隔），第一个值作为 UI 分组             |
+| `@description` | `string`  | 否   | 简介，多行自动拼接                                     |
 
 ::: tip
 `@url` 可以写多行，每行一个镜像地址。第一个会作为主 URL，其余为备用镜像。
@@ -63,6 +63,7 @@
 :::
 
 **示例：**
+
 ```js
 // @name        22笔趣阁
 // @version     1.3.0
@@ -88,10 +89,11 @@
 - 任意依赖下载失败或执行出错，书源加载立即失败并报错
 
 ::: warning
+
 - 只支持 `http://` 或 `https://` 绝对 URL，相对路径无效
 - 依赖不应与主脚本函数名冲突（会被主脚本覆盖）
 - 进程重启后缓存清空，下次首次调用会重新下载
-:::
+  :::
 
 ## 完整文件骨架
 
@@ -107,45 +109,61 @@
 // @description 站点描述
 
 // ─── 配置 / 常量 ───────────────────────────────
-var BASE = 'https://example.com';
+var BASE = "https://example.com";
 
 // ─── 工具函数（按需） ─────────────────────────
 function absUrl(path) {
-  if (path.indexOf('http') === 0) return path;
+  if (path.indexOf("http") === 0) return path;
   return BASE + path;
 }
 
 // ─── 内置测试 ─────────────────────────────────
 async function TEST(type) {
-  if (type === '__list__') return ['search', 'explore'];
+  if (type === "__list__") return ["search", "explore"];
   // ...
 }
 
 // ─── 搜索 ────────────────────────────────────
-async function search(keyword, page) { /* ... */ }
+async function search(keyword, page) {
+  /* ... */
+}
 
 // ─── 详情 ────────────────────────────────────
-async function bookInfo(bookUrl) { /* ... */ }
+async function bookInfo(bookUrl) {
+  /* ... */
+}
 
 // ─── 目录 ────────────────────────────────────
-async function chapterList(tocUrl) { /* ... */ }
+async function chapterList(tocUrl) {
+  /* ... */
+}
+
+// ─── VIP 购买（可选）──────────────────────────
+async function purchaseChapter(chapterUrl, chapter) {
+  /* ... */
+}
 
 // ─── 正文 ────────────────────────────────────
-async function chapterContent(chapterUrl) { /* ... */ }
+async function chapterContent(chapterUrl) {
+  /* ... */
+}
 
 // ─── 发现页（可选） ──────────────────────────
-async function explore(page, category) { /* ... */ }
+async function explore(page, category) {
+  /* ... */
+}
 ```
 
 ## 函数签名一览
 
-| 函数 | 参数 | 返回值 |
-|------|------|--------|
-| `search(keyword, page)` | 搜索词, 页码(从1开始) | `BookItem[]` |
-| `bookInfo(bookUrl)` | 书籍页 URL | `BookItem` |
-| `chapterList(tocUrl)` | 目录页 URL | `ChapterInfo[]` |
-| `chapterContent(chapterUrl)` | 章节 URL | `string` |
-| `explore(page, category)` | 页码, 分类名 | `string[]` 或 `BookItem[]` |
+| 函数                                   | 参数                    | 返回值                               |
+| -------------------------------------- | ----------------------- | ------------------------------------ |
+| `search(keyword, page)`                | 搜索词, 页码(从1开始)   | `BookItem[]`                         |
+| `bookInfo(bookUrl)`                    | 书籍页 URL              | `BookItem`                           |
+| `chapterList(tocUrl)`                  | 目录页 URL              | `ChapterInfo[]`                      |
+| `purchaseChapter(chapterUrl, chapter)` | 章节 URL, `ChapterInfo` | `boolean` 或 `PurchaseChapterResult` |
+| `chapterContent(chapterUrl)`           | 章节 URL                | `string`                             |
+| `explore(page, category)`              | 页码, 分类名            | `string[]` 或 `BookItem[]`           |
 
 `BookItem` 详见 [数据结构 → BookItem](/api/types-book-item)。`search()`、`explore()` 和 `bookInfo()` 都可以返回 `latestChapter`、`latestChapterUrl`、`wordCount`、`chapterCount`、`updateTime`、`status` 等可选元数据。搜索和发现列表只提取当前列表页已有信息，不要逐本请求详情页补齐这些字段。
 
