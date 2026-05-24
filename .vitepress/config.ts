@@ -56,6 +56,7 @@ export default defineConfig({
               text: "chapterContent — 章节正文",
               link: "/guide/chapter-content",
             },
+            { text: "段评接口", link: "/guide/paragraph-comments" },
             { text: "explore — 发现页", link: "/guide/explore" },
           ],
         },
