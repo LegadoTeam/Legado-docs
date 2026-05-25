@@ -2,6 +2,8 @@
 
 Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API。凡是涉及 I/O 的宿主能力（HTTP、哈希、加解密等）均返回 `Promise`，推荐统一使用 `async` / `await`。
 
+> **同步 API（Tauri/Boa 引擎专属）**：Boa 引擎内部 HTTP 和加密本质上都是同步阻塞执行的，额外暴露了不带 `await` 的 `*Sync` 变体。如果书源在 HarmonyOS/移动端运行，请继续使用 `await` 异步版本；Tauri 桌面端两种写法均支持。详见 [同步 API 说明](#sync)。
+
 ## API 分类总览
 
 ### HTTP 请求 {#http}
@@ -9,13 +11,83 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 | API                                                                          | 说明                               |
 | ---------------------------------------------------------------------------- | ---------------------------------- |
 | [`legado.http.get(url, headers?)`](/api/http-get)                            | 异步 GET，请 `await`               |
+| [`legado.http.getSync(url, headers?)`](/api/http-get)                        | **同步 GET**，直接返回文本，无需 `await`（Tauri 专属） |
 | [`legado.http.post(url, body, headers?)`](/api/http-post)                    | 异步 POST，请 `await`              |
+| [`legado.http.postSync(url, body, headers?)`](/api/http-post)                | **同步 POST**，直接返回文本，无需 `await`（Tauri 专属） |
+| [`legado.http.request(options)`](/api/http-request)                          | 兼容层统一 HTTP 接口，返回响应文本 |
+| [`legado.http.requestSync(options)`](/api/http-request)                      | **同步** 兼容层 HTTP 接口（Tauri 专属） |
 | [`legado.http.postBinary(url, base64Body, headers?)`](/api/http-post-binary) | 异步二进制 POST                    |
 | [`legado.http.batchGet(urls, headers?, concurrency?)`](/api/http-batch-get)  | 并发批量 GET                       |
-| [`legado.http.request(options)`](/api/http-request)                          | 兼容层统一 HTTP 接口，返回响应文本 |
 | [`fetch(input, init?)`](/api/http-fetch)                                     | 浏览器风格请求接口（全局注入）     |
 
 ### DOM 解析 {#dom}
+
+| API                                                                  | 说明                                  |
+| -------------------------------------------------------------------- | ------------------------------------- |
+| [`legado.dom.parse(html)`](/api/dom-parse)                           | 解析 HTML → 文档句柄                  |
+| [`legado.dom.select(handle, sel)`](/api/dom-select)                  | CSS 选择首个匹配                      |
+| [`legado.dom.selectAll(handle, sel)`](/api/dom-select)               | CSS 选择全部匹配                      |
+| [`legado.dom.text(handle)`](/api/dom-text)                           | 获取元素全部文本                      |
+| [`legado.dom.html(handle)`](/api/dom-text)                           | 获取 innerHTML                        |
+| [`legado.dom.attr(handle, name)`](/api/dom-text)                     | 获取属性值                            |
+| [`legado.dom.selectText(handle, sel)`](/api/dom-shortcuts)           | 快捷：select + text                   |
+| [`legado.dom.selectAttr(handle, sel, attr)`](/api/dom-shortcuts)     | 快捷：select + attr                   |
+| [`legado.dom.selectAllTexts(handle, sel)`](/api/dom-shortcuts)       | 快捷：selectAll + text                |
+| [`legado.dom.selectAllAttrs(handle, sel, attr)`](/api/dom-shortcuts) | 快捷：selectAll + attr                |
+| [`legado.dom.selectByText(handle, text)`](/api/dom-utils)            | 按文本查找元素                        |
+| [`legado.dom.remove(handle, sel)`](/api/dom-utils)                   | 移除匹配元素                          |
+| [`legado.dom.free(handle)`](/api/dom-parse)                          | 释放文档句柄                          |
+| [`legado.dom2.*`](/api/dom2)                                         | 对象风格 DOM 兼容层（Tauri 兼容入口） |
+
+### 编码与加密 {#encoding}
+
+| API                                                           | 说明                                    |
+| ------------------------------------------------------------- | --------------------------------------- |
+| `btoa(str)` / `atob(str)`                                     | Base64 编解码（标准 JS）                |
+| `encodeURIComponent(str)` / `decodeURIComponent(str)`         | URL 编解码（标准 JS）                   |
+| [`legado.urlEncodeCharset(str, charset)`](/api/encoding)      | 指定字符集 URL 编码（GBK 等）           |
+| `legado.urlEncodeCharsetSync(str, charset)`                   | **同步**指定字符集 URL 编码（Tauri 专属）|
+| [`legado.htmlEncode(str)` / `htmlDecode(str)`](/api/encoding) | HTML 实体编解码                         |
+| `legado.htmlEncodeSync(str)` / `legado.htmlDecodeSync(str)`   | **同步** HTML 实体编解码（Tauri 专属）  |
+| [`legado.md5(str)`](/api/hash)                                | 异步 MD5 哈希                           |
+| `legado.md5Sync(str)`                                         | **同步** MD5 哈希（Tauri 专属）         |
+| [`legado.sha1(str)` / `sha256(str)`](/api/hash)               | 异步 SHA 哈希                           |
+| `legado.sha1Sync(str)` / `legado.sha256Sync(str)`             | **同步** SHA 哈希（Tauri 专属）         |
+| `legado.hmacSha256Sync(data, key)`                            | **同步** HMAC-SHA256（Tauri 专属）      |
+| [`legado.aesEncrypt(...)` / `aesDecrypt(...)`](/api/crypto)   | 异步 AES 加解密                         |
+| `legado.aesEncryptSync(...)` / `legado.aesDecryptSync(...)`   | **同步** AES 加解密（Tauri 专属）       |
+| [`legado.desEncrypt(...)` / `desDecrypt(...)`](/api/crypto)   | 异步 DES 加解密                         |
+| `legado.desEncryptSync(...)` / `legado.desDecryptSync(...)`   | **同步** DES 加解密（Tauri 专属）       |
+| [`legado.wasm.*`](/api/wasm)                                  | Wasm 扩展：数字 ABI 与 JSON ptr-len ABI |
+
+### 同步 API 说明 {#sync}
+
+Boa 引擎中所有 HTTP 请求和加密操作本质上都是**同步阻塞**执行的（HTTP 使用 reqwest blocking，加密是纯 CPU 计算）。`await` 风格是为了与 HarmonyOS 端保持接口一致而引入的 Promise 包装层。
+
+**同步写法示例（仅 Tauri/Boa 可用）：**
+
+```js
+// 无需 async function，直接调用
+const html = legado.http.getSync("https://example.com");
+const hash = legado.md5Sync("hello world");
+const cipher = legado.aesEncryptSync(data, key, iv);
+```
+
+**跨平台兼容写法（推荐）：**
+
+```js
+// 在 async 函数中使用 await，Tauri 和 HarmonyOS 均支持
+async function getChapter(url) {
+  const html = await legado.http.get(url);
+  return html;
+}
+```
+
+> **注意**：`*Sync` 系列函数在 HarmonyOS / 移动端**不可用**，仅适用于 Tauri 桌面客户端。  
+> 新书源建议使用 `await` 异步风格以保持跨平台兼容性；  
+> 老书源或需要在非 `async` 函数顶层直接调用时，可使用 Sync 变体。
+
+### 浏览器探测 {#browser}
 
 | API                                                                  | 说明                                  |
 | -------------------------------------------------------------------- | ------------------------------------- |
