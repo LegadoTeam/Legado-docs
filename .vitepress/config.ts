@@ -77,7 +77,7 @@ export default defineConfig({
         {
           text: "测试与调试",
           items: [
-            { text: "CLI 测试工具", link: "/guide/cli-testing" },
+            { text: "命令行参考", link: "/guide/cli-testing" },
             { text: "调试技巧", link: "/guide/debugging" },
           ],
         },

@@ -41,6 +41,6 @@ features:
     title: 多类型支持
     details: 支持小说、漫画、视频三种书源类型，统一的开发模式，灵活的返回格式。
   - icon: 🛠️
-    title: CLI 测试工具
-    details: 命令行模式逐模块测试书源，无需启动 GUI，快速验证搜索、详情、目录、正文。
+    title: 命令行参考
+    details: 覆盖 GUI、书源 CLI、JS 求值和独立 Web 服务模式，便于调试书源与部署后端。
 ---

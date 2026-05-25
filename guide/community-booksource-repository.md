@@ -90,6 +90,7 @@ async function search(key) {
 {
   "name": "Legado Tauri 书源仓库",
   "version": "1.0.0",
+  "url": "https://example.com/repository",
   "updatedAt": "2026-04-20T00:00:00Z",
   "sources": [
     {
@@ -115,6 +116,7 @@ async function search(key) {
 
 - `name`：仓库名称
 - `version`：仓库版本号，不等同于单个书源版本
+- `url`：仓库主页或平台展示页地址，可选；客户端展示仓库名称时会作为外部链接打开
 - `updatedAt`：仓库索引生成时间，UTC ISO 格式
 - `sources`：全部书源清单
 
