@@ -1,3 +1,4 @@
+// VitePress 站点配置：定义文档站的导航、侧边栏、搜索与基础品牌信息。
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
@@ -6,10 +7,10 @@ export default defineConfig({
   lang: "zh-CN",
   base: "/",
 
-  head: [["link", { rel: "icon", type: "image/svg+xml", href: "/logo.svg" }]],
+  head: [["link", { rel: "icon", type: "image/png", href: "/logo.png" }]],
 
   themeConfig: {
-    logo: "/logo.svg",
+    logo: "/logo.png",
     siteTitle: "Legado Tauri",
 
     nav: [

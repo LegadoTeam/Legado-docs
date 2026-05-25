@@ -2,9 +2,9 @@
 
 Legado Tauri 提供两类设备标识，分别对应不同的生命周期与来源：
 
-| 类型 | 函数 | 来源 | 生命周期 |
-|------|------|------|---------|
-| **硬件 UID**（Hardware UID） | `legado.runtime.getMachineUid()` | 操作系统底层接口 | 与设备硬件/系统绑定，**重装软件后不变** |
+| 类型                         | 函数                              | 来源                                    | 生命周期                                    |
+| ---------------------------- | --------------------------------- | --------------------------------------- | ------------------------------------------- |
+| **硬件 UID**（Hardware UID） | `legado.runtime.getMachineUid()`  | 操作系统底层接口                        | 与设备硬件/系统绑定，**重装软件后不变**     |
 | **软 UUID**（Software UUID） | `legado.runtime.getMachineUUID()` | 首次启动随机生成并写入 `app_state.redb` | 与应用数据目录绑定，**卸载/清除数据后重置** |
 
 ---
@@ -39,7 +39,7 @@ var sign = await legado.md5(uid + secretKey);
 
 // 作为请求头传给服务端
 var result = await legado.http.get(url, {
-  'X-Device-Id': await legado.runtime.getMachineUid()
+  "X-Device-Id": await legado.runtime.getMachineUid(),
 });
 ```
 
@@ -69,18 +69,18 @@ var uuid = await legado.runtime.getMachineUUID();
 // 格式: "550e8400-e29b-41d4-a716-446655440000" (UUID v4)
 
 // 用于无需强绑定硬件的场景，如个性化配置同步
-legado.config.write('my_source', 'install_id', uuid);
+legado.config.write("my_source", "install_id", uuid);
 ```
 
 ---
 
 ## 两种标识的选型指南
 
-| 场景 | 推荐 |
-|------|------|
-| 平台账号鉴权、防盗链、跨版本稳定绑定 | `getMachineUid()` |
-| 仅需区分不同安装实例、无跨平台需求 | `getMachineUUID()` |
-| 不确定系统是否支持硬件 UID | `getMachineUid()`（自动回落） |
+| 场景                                 | 推荐                          |
+| ------------------------------------ | ----------------------------- |
+| 平台账号鉴权、防盗链、跨版本稳定绑定 | `getMachineUid()`             |
+| 仅需区分不同安装实例、无跨平台需求   | `getMachineUUID()`            |
+| 不确定系统是否支持硬件 UID           | `getMachineUid()`（自动回落） |
 
 ::: warning 隐私提示
 设备标识是唯一性较强的信息。书源脚本应仅在平台明确要求设备鉴权时使用，不应在与设备身份无关的场景中采集或上传。
@@ -92,17 +92,77 @@ legado.config.write('my_source', 'install_id', uuid);
 
 ```js
 // 检测硬件 UID 能力是否可用
-if (legado.runtime.has('machineUid')) {
+if (legado.runtime.has("machineUid")) {
   var uid = await legado.runtime.getMachineUid();
 }
 
 // 软 UUID 始终可用（不需要检测，但可以检测）
-if (legado.runtime.has('machineUUID')) {
+if (legado.runtime.has("machineUUID")) {
   var uuid = await legado.runtime.getMachineUUID();
 }
 ```
 
-| 能力名 | 含义 |
-|--------|------|
-| `machineUid` | 硬件 UID 接口可用（`getMachineUid` 可能返回真实硬件 ID） |
-| `machineUUID` | 软 UUID 接口可用（`getMachineUUID` 可直接调用） |
+| 能力名        | 含义                                                     |
+| ------------- | -------------------------------------------------------- |
+| `machineUid`  | 硬件 UID 接口可用（`getMachineUid` 可能返回真实硬件 ID） |
+| `machineUUID` | 软 UUID 接口可用（`getMachineUUID` 可直接调用）          |
+
+---
+
+## legado.runtime 运行时信息
+
+除设备标识外，`legado.runtime` 还暴露当前运行时环境的完整信息。
+
+### 属性
+
+| 属性                          | 类型     | 说明                 | 典型值                                                      |
+| ----------------------------- | -------- | -------------------- | ----------------------------------------------------------- |
+| `legado.runtime.platform`     | `string` | 运行平台             | `"tauri"`                                                   |
+| `legado.runtime.engine`       | `string` | JS 引擎名称          | `"boa"`                                                     |
+| `legado.runtime.os`           | `string` | 操作系统             | `"windows"` / `"macos"` / `"linux"` / `"android"` / `"ios"` |
+| `legado.runtime.capabilities` | `object` | 所有能力的布尔映射表 | `{ asyncHostApi: true, browserProbe: true, … }`             |
+
+### legado.runtime.has(name)
+
+检测某项能力是否可用，返回 `boolean`（同步）。
+
+```js
+legado.runtime.has(name) → boolean
+```
+
+### 完整能力列表
+
+| 能力名         | 含义                                      |
+| -------------- | ----------------------------------------- |
+| `asyncHostApi` | 宿主 API 支持 async/await                 |
+| `browserProbe` | 浏览器探测会话可用                        |
+| `configBytes`  | `legado.config.readBytes/writeBytes` 可用 |
+| `dom`          | `legado.dom.*` DOM 解析可用               |
+| `image`        | `legado.image.*` 图片处理可用             |
+| `machineUid`   | 硬件 UID 接口可用                         |
+| `machineUUID`  | 软 UUID 接口可用                          |
+| `uiEmit`       | `legado.ui.emit` 可用                     |
+| `wasm`         | `legado.wasm.*` Wasm 扩展可用             |
+
+### 示例
+
+```js
+// 读取运行时信息
+legado.log("平台: " + legado.runtime.platform); // "tauri"
+legado.log("系统: " + legado.runtime.os); // "windows"
+legado.log("引擎: " + legado.runtime.engine); // "boa"
+
+// 按平台走不同逻辑
+if (legado.runtime.os === "android") {
+  // Android 特有处理
+}
+
+// 能力探测
+if (legado.runtime.has("browserProbe")) {
+  var session = await legado.browser.acquire("main");
+  // ...
+}
+
+// 打印完整能力表
+legado.log(JSON.stringify(legado.runtime.capabilities));
+```

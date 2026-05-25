@@ -64,13 +64,20 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 
 ### 图片处理 {#image}
 
-| API                                                   | 说明            |
-| ----------------------------------------------------- | --------------- |
-| [`legado.image.decode(base64)`](/api/image)           | 解码图片 → 句柄 |
-| [`legado.image.create(w, h)`](/api/image)             | 创建空白图片    |
-| [`legado.image.crop(handle, x, y, w, h)`](/api/image) | 裁剪            |
-| [`legado.image.paste(dest, src, x, y)`](/api/image)   | 粘贴            |
-| [`legado.image.encode(handle, format?)`](/api/image)  | 编码为 base64   |
+| API                                                                      | 说明                |
+| ------------------------------------------------------------------------ | ------------------- |
+| [`legado.image.decode(base64)`](/api/image)                              | 解码图片 → 句柄     |
+| [`legado.image.create(w, h)`](/api/image)                                | 创建空白图片        |
+| [`legado.image.width(handle)`](/api/image)                               | 获取宽度            |
+| [`legado.image.height(handle)`](/api/image)                              | 获取高度            |
+| [`legado.image.crop(handle, x, y, w, h)`](/api/image)                    | 裁剪                |
+| [`legado.image.paste(dest, src, x, y)`](/api/image)                      | 粘贴                |
+| [`legado.image.copyRegion(src, dest, sx, sy, w, h, dx, dy)`](/api/image) | 区域复制            |
+| [`legado.image.encode(handle, format?)`](/api/image)                     | 编码为 base64       |
+| [`legado.image.free(handle)`](/api/image)                                | 释放句柄            |
+| [`legado.image.qrCode(text, size?)`](/api/image)                         | 生成二维码 → 句柄   |
+| [`legado.image.qrCodeDataUrl(text, size?)`](/api/image)                  | 生成二维码 data URL |
+| [`legado.image.jmDecode(srcHandle, num)`](/api/image)                    | 禁漫条带还原        |
 
 ### 设备标识 {#device-id}
 
@@ -84,13 +91,27 @@ Legado Tauri 书源引擎通过 `legado.*` 命名空间向脚本注入宿主 API
 
 ### 其他 {#misc}
 
-| API                                                     | 说明         |
-| ------------------------------------------------------- | ------------ |
-| [`legado.log(msg)`](/api/log)                           | 打印日志     |
-| [`legado.toast(msg)`](/api/log)                         | 显示通知     |
-| [`legado.config.read(scope, key)`](/api/config)         | 读取配置     |
-| [`legado.config.write(scope, key, value)`](/api/config) | 写入配置     |
-| [`legado.ui.emit(event, data)`](/api/ui-emit)           | 推送 UI 事件 |
+| API                                                          | 说明                         |
+| ------------------------------------------------------------ | ---------------------------- |
+| [`legado.log(msg)`](/api/log)                                | 打印日志                     |
+| [`legado.toast(msg)`](/api/log)                              | 显示通知                     |
+| [`legado.sleep(ms)`](/api/log)                               | 同步阻塞延迟（不需要 await） |
+| [`legado.config.read(scope, key)`](/api/config)              | 读取配置                     |
+| [`legado.config.write(scope, key, value)`](/api/config)      | 写入配置                     |
+| [`legado.config.readBytes(scope, key)`](/api/config)         | 读取字节数组配置             |
+| [`legado.config.writeBytes(scope, key, bytes)`](/api/config) | 写入字节数组配置             |
+| [`legado.ui.emit(event, data)`](/api/ui-emit)                | 推送 UI 事件                 |
+
+### 运行时信息 {#runtime}
+
+| API                                                                    | 说明                                      |
+| ---------------------------------------------------------------------- | ----------------------------------------- |
+| [`legado.runtime.platform`](/api/device-id#legado-runtime-运行时信息)  | 运行平台（`"tauri"`）                     |
+| [`legado.runtime.engine`](/api/device-id#legado-runtime-运行时信息)    | JS 引擎名称（`"boa"`）                    |
+| [`legado.runtime.os`](/api/device-id#legado-runtime-运行时信息)        | 操作系统（`"windows"` / `"android"` / …） |
+| [`legado.runtime.has(name)`](/api/device-id#legado-runtime-运行时信息) | 检测某项能力是否可用                      |
+| [`legado.runtime.getMachineUid()`](/api/device-id)                     | 获取硬件 UID（重装不变）                  |
+| [`legado.runtime.getMachineUUID()`](/api/device-id)                    | 获取软 UUID（清数据后重置）               |
 
 ### 数据结构 {#types}
 

@@ -5,23 +5,41 @@
 ## 函数签名
 
 ```js
-async function explore(page, category) → Promise<string[] | BookItem[] | { type: 'html', html: string }>
+async function explore(page, category) → Promise<string[] | ExploreCategory[] | BookItem[] | { type: 'html', html: string }>
 ```
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `page` | `number` | 页码，从 1 开始 |
-| `category` | `string` | 分类名，或 `'GETALL'` 表示获取所有分类 |
+| `category` | `string` | 分类名、分类 URL，或 `'GETALL'` 表示获取所有分类 |
 
 ### 返回值
 
 | 调用场景 | 返回类型 | 说明 |
 |---------|---------|------|
-| `category === 'GETALL'` | `string[]` | 分类名数组 |
-| 指定分类名 | `BookItem[]` | 该分类下的书籍列表 |
+| `category === 'GETALL'` | `string[] \| ExploreCategory[]` | 分类数组；推荐返回对象数组以区分同名分类 |
+| 指定分类名或 URL | `BookItem[]` | 该分类下的书籍列表 |
 | 特殊分类（如"设置"） | `{ type: 'html', html: '...' }` | HTML 交互页面 |
 
 `BookItem` 的完整字段规则见 [BookItem](/api/types-book-item)。发现页元数据字段与搜索页一致。
+
+`ExploreCategory` 结构如下：
+
+```ts
+interface ExploreCategory {
+  /** 前端显示的分类名称 */
+  name: string;
+  /** 实际传回 explore(page, category) 的稳定分类值，可为 URL、ID 或筛选参数 */
+  url: string;
+  /** 可选。移动端分类入口宽度提示，桌面端暂不使用 */
+  style?: {
+    layout_flexGrow?: number;
+    layout_flexBasisPercent?: number; // 1=100%，0.4=40%，0.25=25%
+  };
+}
+```
+
+为兼容旧书源，`GETALL` 仍可返回 `string[]`。如果存在多个同名入口，应返回 `{ name, url }` 对象数组；前端显示 `name`，加载时传 `url`，因此同名分类不会互相覆盖。
 
 ## 基本示例
 
@@ -58,6 +76,34 @@ async function explore(page, category) {
   return books;
 }
 ```
+
+## 同名分类与移动端宽度
+
+旧阅读的发现入口常用 `标题::URL::宽度` 或 FlexBox JSON 描述分类布局。新书源可以直接返回对象数组：
+
+```js
+async function explore(page, category) {
+  var cats = [
+    { name: '畅销榜', url: BASE + '/api/rank?tid=75&rid=1&page={{page}}', style: { layout_flexGrow: 1, layout_flexBasisPercent: 1 } },
+    { name: '古代', url: BASE + '/api/rank?tid=3&rid=1&page={{page}}', style: { layout_flexGrow: 1, layout_flexBasisPercent: 0.25 } },
+    { name: '古代', url: BASE + '/api/rank?tid=3&rid=2&page={{page}}', style: { layout_flexGrow: 1, layout_flexBasisPercent: 0.25 } }
+  ];
+
+  if (category === 'GETALL') {
+    return cats;
+  }
+
+  var selected = cats.find(function(cat) {
+    return cat.url === category || cat.name === category;
+  });
+  if (!selected) return [];
+
+  var resp = await legado.http.get(selected.url.replace('{{page}}', page));
+  // ... 解析逻辑
+}
+```
+
+移动端会尽量按 `style.layout_flexBasisPercent` 还原旧阅读 FlexBox 宽度，例如 `1` 为整行、`0.4` 为 40%、`0.25` 为 25%。桌面端当前忽略这个布局提示，仍按普通标签自然排列。
 
 发现页只返回当前分类页已经提供的元数据；不要为了补齐字数、章节数、状态或更新时间在 `explore()` 中逐本请求详情页。
 
