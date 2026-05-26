@@ -22,8 +22,8 @@ hero:
       text: GitHub docs 仓库
       link: https://github.com/LegadoTeam/Legado-docs
     - theme: alt
-      text: GitHub Tauri Release 仓库（下载地址）
-      link: https://github.com/LegadoTeam/Legado-Tauri-Release
+      text: GitHub Tauri （下载地址）
+      link: https://github.com/LegadoTeam/Legado-Tauri/release/latest
     - theme: alt
       text: QQ 交流群
       link: "#qq-group"
