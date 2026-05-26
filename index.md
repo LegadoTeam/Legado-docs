@@ -23,7 +23,7 @@ hero:
       link: https://github.com/LegadoTeam/Legado-docs
     - theme: alt
       text: GitHub Tauri （下载地址）
-      link: https://github.com/LegadoTeam/Legado-Tauri/release/latest
+      link: https://github.com/LegadoTeam/Legado-Tauri/releases/latest
     - theme: alt
       text: QQ 交流群
       link: "#qq-group"
