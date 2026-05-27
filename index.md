@@ -70,7 +70,7 @@ features:
         <div>
           <div class="qq-group-label">
             <span>二群</span>
-            <span class="qq-group-status">可加入</span>
+            <span class="qq-group-status">已满</span>
           </div>
           <div class="qq-group-number">949235656</div>
         </div>
